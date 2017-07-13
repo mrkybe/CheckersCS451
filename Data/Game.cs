@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataStructures
+namespace Data
 {
     // Gamemaster - Maintains that the game rules are followed, turns taken in correct order,
     //              initializses game state, resolves the outcome of commands from players
