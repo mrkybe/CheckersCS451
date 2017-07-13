@@ -55,5 +55,11 @@
       <DependentUpon>BoardDisplay.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DataStructures\DataStructures.csproj">
+      <Project>{fd62e364-61c8-4155-be3b-c7fe514b82b3}</Project>
+      <Name>DataStructures</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
