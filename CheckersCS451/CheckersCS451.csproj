@@ -80,9 +80,9 @@
       <Project>{ce63ccc7-5dd2-43f5-b76f-eb0f7df0f480}</Project>
       <Name>CustomControls</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DataStructures\DataStructures.csproj">
+    <ProjectReference Include="..\DataStructures\Data.csproj">
       <Project>{fd62e364-61c8-4155-be3b-c7fe514b82b3}</Project>
-      <Name>DataStructures</Name>
+      <Name>Data</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

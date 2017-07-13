@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DataStructures;
 
 namespace CheckersServer
 {
@@ -11,9 +12,8 @@ namespace CheckersServer
         static void Main(string[] args)
         {
             Console.WriteLine("TEST");
+            List<Game> games = new List<Game> {new Game()};
             Console.ReadLine();
         }
-
-
     }
 }
