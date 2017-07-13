@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26430.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckersCS451", "CheckersCS451\CheckersCS451.csproj", "{D859DF9B-907F-4B31-A1FF-804DF67ACB8D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomControls", "CheckerboardControl\CustomControls.csproj", "{CE63CCC7-5DD2-43F5-B76F-EB0F7DF0F480}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{D859DF9B-907F-4B31-A1FF-804DF67ACB8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D859DF9B-907F-4B31-A1FF-804DF67ACB8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D859DF9B-907F-4B31-A1FF-804DF67ACB8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE63CCC7-5DD2-43F5-B76F-EB0F7DF0F480}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE63CCC7-5DD2-43F5-B76F-EB0F7DF0F480}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE63CCC7-5DD2-43F5-B76F-EB0F7DF0F480}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE63CCC7-5DD2-43F5-B76F-EB0F7DF0F480}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
