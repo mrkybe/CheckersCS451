@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Drawing;
+using System.Linq;
 using static Data.STATE;
 
 namespace Data
@@ -17,18 +21,183 @@ namespace Data
             Console.WriteLine(DebugPrintArray());
             Console.WriteLine("\n");
             Console.WriteLine(DebugPrintSparseArray());
+            Console.WriteLine(DebugPrintNodes(GetAvailableEmptyPositionsFor(new Point(1, 1)), "EMPTY"));
+            Console.WriteLine(DebugPrintNodes(GetAvailableJumps(new Point(1, 1)), "JUMPS"));
         }
 
         private void PlaceTestPieces()
         {
-            PlacePiece(RED, 0, 0);
-            PlacePiece(BLACK, 1, 1);
+            PlacePiece(BLACK, 0, 0);
+            PlacePiece(RED, 1, 1);
+            PlacePiece(BLACK, 0, 1);
+            PlacePiece(BLACK, 0, 2);
+            PlacePiece(BLACK, 2, 2);
         }
+
+        private string DebugPrintNodes(List<Node> points, string title = "")
+        {
+            string s = title + "\n";
+            foreach (Node n in points)
+            {
+                Point p = n.GetSparsePosition();
+                s += n.GetStateString() + "(" + p.X + ", " + p.Y + ")";
+                s += "\n";
+            }
+            return s;
+        }
+
+        private ReadOnlyCollection<Node> GetSpacesToCheck(Point pos)
+        {
+            return sparseArray[pos.X, pos.Y].GetNeighbors();
+        }
+
+        private List<Node> GetAvailableEmptyPositionsFor(Node n)
+        {
+            return GetAvailableEmptyPositionsFor(n.GetSparsePosition());   
+        }
+
+        private List<Node> GetAvailableEmptyPositionsFor(Point pos)
+        {
+            Node n = sparseArray[pos.X, pos.Y];
+            STATE piece = n.GetState();
+            var neighbors = GetSpacesToCheck(pos);
+            if (piece == EMPTY)
+            {
+                return new List<Node>();
+                // maybe we should throw an exception?  or actually return a list of empty neighbors?
+            }
+            else if (piece == RED)
+            {
+                return neighbors.Where(x => x.GetState() == EMPTY &&
+                                            x.GetSparsePosition().Y < n.GetSparsePosition().Y
+                                            ).ToList();
+            }
+            else if (piece == BLACK)
+            {
+                return neighbors.Where(x => x.GetState() == EMPTY// &&
+                                            //x.GetSparsePosition().Y > n.GetSparsePosition().Y
+                                            ).ToList();
+            }
+            else if (piece == KING_RED || piece == KING_BLACK)
+            {
+                return neighbors.Where(x => x.GetState() == EMPTY).ToList();
+            }
+            else
+            {
+                throw new NullReferenceException("");
+            }
+        }
+
+        private bool IsEmpty(Point pos)
+        {
+            if (pos.X < 0 || pos.X > 3)
+                return false;
+            if (pos.Y < 0 || pos.Y > 8)
+                return false;
+            return sparseArray[pos.X, pos.Y].GetState() == EMPTY;
+        }
+
+        private List<Node> GetAvailableJumps(Point pos)
+        {
+            Node n = sparseArray[pos.X, pos.Y];
+            STATE piece = n.GetState();
+            var neighbors = GetSpacesToCheck(pos);
+
+            List<Node> validJumps = new List<Node>();
+            if (piece == EMPTY)
+            {
+                return validJumps;
+                // maybe we should throw an exception?  or actually return a list of empty neighbors?
+            }
+            else if (piece == RED)
+            {
+                var candidates = neighbors.Where(x => (x.GetState() == BLACK || x.GetState() == KING_BLACK) &&
+                                                       x.GetSparsePosition().Y < n.GetSparsePosition().Y &&
+                                                       GetAvailableEmptyPositionsFor(x).Count > 0
+                                                       ).ToList();
+                foreach (var candidate in candidates)
+                {
+                    Point candidatePos = candidate.GetSparsePosition();
+                    int jumpVectorX = candidatePos.X - n.GetSparsePosition().X;
+                    int jumpVectorY = candidatePos.Y - n.GetSparsePosition().Y;
+                    Point jumpPos = new Point(candidatePos.X + jumpVectorX, candidatePos.Y + jumpVectorY);
+                    if (IsEmpty(jumpPos))
+                    {
+                        validJumps.Add(candidate);
+                    }
+                }
+                return validJumps;
+            }
+            else if (piece == BLACK)
+            {
+                var candidates = neighbors.Where(x => (x.GetState() == RED || x.GetState() == KING_RED) &&
+                                                       x.GetSparsePosition().Y > n.GetSparsePosition().Y &&
+                                                       GetAvailableEmptyPositionsFor(x).Count > 0
+                                                       ).ToList();
+                foreach (var candidate in candidates)
+                {
+                    Point candidatePos = candidate.GetSparsePosition();
+                    int jumpVectorX = candidatePos.X - n.GetSparsePosition().X;
+                    int jumpVectorY = candidatePos.Y - n.GetSparsePosition().Y;
+                    Point jumpPos = new Point(candidatePos.X + jumpVectorX, candidatePos.Y + jumpVectorY);
+                    if (IsEmpty(jumpPos))
+                    {
+                        validJumps.Add(candidate);
+                    }
+                }
+                return validJumps;
+            }
+            else if (piece == KING_RED)
+            {
+                var candidates = neighbors.Where(x => (x.GetState() == BLACK || x.GetState() == KING_BLACK) &&
+                                                       GetAvailableEmptyPositionsFor(x).Count > 0
+                                                       ).ToList();
+                foreach (var candidate in candidates)
+                {
+                    Point candidatePos = candidate.GetSparsePosition();
+                    int jumpVectorX = candidatePos.X - n.GetSparsePosition().X;
+                    int jumpVectorY = candidatePos.Y - n.GetSparsePosition().Y;
+                    Point jumpPos = new Point(candidatePos.X + jumpVectorX, candidatePos.Y + jumpVectorY);
+                    if (IsEmpty(jumpPos))
+                    {
+                        validJumps.Add(candidate);
+                    }
+                }
+                return validJumps;
+            }
+            else if (piece == KING_BLACK)
+            {
+                var candidates = neighbors.Where(x => (x.GetState() == RED || x.GetState() == KING_RED) &&
+                                                       GetAvailableEmptyPositionsFor(x).Count > 0
+                                                       ).ToList();
+                foreach (var candidate in candidates)
+                {
+                    Point candidatePos = candidate.GetSparsePosition();
+                    int jumpVectorX = candidatePos.X - n.GetSparsePosition().X;
+                    int jumpVectorY = candidatePos.Y - n.GetSparsePosition().Y;
+                    Point jumpPos = new Point(candidatePos.X + jumpVectorX, candidatePos.Y + jumpVectorY);
+                    if (IsEmpty(jumpPos))
+                    {
+                        validJumps.Add(candidate);
+                    }
+                }
+                return validJumps;
+            }
+            return null;
+        }
+
+        private bool CheckForStalemate() { return false; }
+
 
         private void PlacePiece(STATE kind, int x, int y)
         {
             var n = sparseArray[x, y];
             n.SetState(kind);
+        }
+
+        private void PlacePiece(STATE kind, Point pos)
+        {
+            PlacePiece(kind, pos.X, pos.Y);
         }
 
         private void PlacePieces()
@@ -59,16 +228,16 @@ namespace Data
                 {
                     if ((x % 2 == 0) ^ (y % 2 == 0))
                     {
-                        var coords = new Tuple<int, int>(x, y);
+                        var coords = new Point(x, y);
                         var sparseCoords = ToSparseXY(coords);
                         var n = new Node(coords, sparseCoords);
 
                         array[x, y] = n;
-                        if (sparseArray[sparseCoords.Item1, sparseCoords.Item2] != null)
+                        if (sparseArray[sparseCoords.X, sparseCoords.Y] != null)
                         {
                             throw new Exception("OOPS");
                         }
-                        sparseArray[sparseCoords.Item1, sparseCoords.Item2] = n;
+                        sparseArray[sparseCoords.X, sparseCoords.Y] = n;
                     }
                 }
             }
@@ -94,10 +263,10 @@ namespace Data
             }
         }
 
-        public Tuple<int, int> ToSparseXY(Tuple<int, int> coords)
+        public Point ToSparseXY(Point coords)
         {
-            var x = coords.Item1;
-            var y = coords.Item2;
+            var x = coords.X;
+            var y = coords.Y;
             if (y % 2 == 0)
             {
                 x = (x - 1) / 2;
@@ -106,7 +275,7 @@ namespace Data
             {
                 x = x / 2;
             }
-            return new Tuple<int, int>(x, y);
+            return new Point(x, y);
         }
 
         public string DebugPrintArray()

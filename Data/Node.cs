@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Drawing;
+using System.Linq;
 
 namespace Data
 {
@@ -16,15 +20,21 @@ namespace Data
     internal class Node
     {
         private readonly List<Node> connectedNodes = new List<Node>();
-        private Tuple<int, int> normalCoords;
-        private Tuple<int, int> sparseCoords;
-        private STATE state = STATE.NULL;
+        private Point normalCoords;
+        private Point sparseCoords;
+        private STATE state = STATE.EMPTY;
 
-        public Node(Tuple<int, int> normalCoords, Tuple<int, int> sparseCoords)
+        public Node(Point normalCoords, Point sparseCoords)
         {
             this.normalCoords = normalCoords;
             this.sparseCoords = sparseCoords;
         }
+
+        public Point GetSparsePosition()
+        {
+            return new Point(sparseCoords.X, sparseCoords.Y);
+        }
+
 
         public void LinkTo(Node n, bool origin = true)
         {
@@ -45,28 +55,24 @@ namespace Data
 
         public STATE GetState() { return state; }
 
+        public ReadOnlyCollection<Node> GetNeighbors() { return connectedNodes.AsReadOnly(); }
+
         public string GetStateString()
         {
             switch (state)
             {
                 case STATE.RED:
                     return "r";
-                    break;
                 case STATE.BLACK:
                     return "b";
-                    break;
                 case STATE.KING_RED:
                     return "R";
-                    break;
                 case STATE.KING_BLACK:
                     return "B";
-                    break;
                 case STATE.EMPTY:
                     return "o";
-                    break;
                 case STATE.NULL:
                     return "_";
-                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
