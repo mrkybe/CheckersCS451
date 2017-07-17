@@ -15,7 +15,7 @@ Custom WinForms control for displaying an interactive game board for checkers.
 Server application that hosts the Gamemaster.  Matches a newly connected player's client to a Gamemaster.   Maintains connection to the player's clients.  Passes messages from the client to the appropriate Gamemaster.  Sends clients the updated game state.
 
 #### Data
-Gamemaster class is here.  Maintains that the game rules are followed, that turns are taken in the correct order, resolves the outcome of commands from players, initializses the game state.  Pretty the most bare-bones form of whatever game.  Doesn't care its online.
+Gamemaster class is here.  Maintains that the game rules are followed, that turns are taken in the correct order, resolves the outcome of commands from players, initializses the game state.  Pretty much just the most bare-bones form of whatever game, in this case checkers.  Doesn't care its online.
 
 ## Authors
 * Ruslan Kaybyshev
