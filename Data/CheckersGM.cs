@@ -1,4 +1,5 @@
 ﻿using System;
+using static Data.STATE;
 
 namespace Data
 {
@@ -10,9 +11,44 @@ namespace Data
         public CheckersGM()
         {
             InitializeBoard();
+            //PlacePieces();
+            PlaceTestPieces();
+
             Console.WriteLine(DebugPrintArray());
             Console.WriteLine("\n");
             Console.WriteLine(DebugPrintSparseArray());
+        }
+
+        private void PlaceTestPieces()
+        {
+            PlacePiece(RED, 0, 0);
+            PlacePiece(BLACK, 1, 1);
+        }
+
+        private void PlacePiece(STATE kind, int x, int y)
+        {
+            var n = sparseArray[x, y];
+            n.SetState(kind);
+        }
+
+        private void PlacePieces()
+        {
+            for (int y = 0; y < 8; y++)
+            {
+                for (int x = 0; x < 4; x++)
+                {
+                    var s = EMPTY;
+                    if (y <= 2)
+                    {
+                        s = RED;
+                    }
+                    else if (y >= 5)
+                    {
+                        s = BLACK;
+                    }
+                    PlacePiece(s, x, y);
+                }
+            }
         }
 
         private void InitializeBoard()
@@ -26,16 +62,7 @@ namespace Data
                         var coords = new Tuple<int, int>(x, y);
                         var sparseCoords = ToSparseXY(coords);
                         var n = new Node(coords, sparseCoords);
-                        var s = STATE.EMPTY;
-                        if (y <= 2)
-                        {
-                            s = STATE.RED;
-                        }
-                        else if (y >= 5)
-                        {
-                            s = STATE.BLACK;
-                        }
-                        n.SetState(s);
+
                         array[x, y] = n;
                         if (sparseArray[sparseCoords.Item1, sparseCoords.Item2] != null)
                         {

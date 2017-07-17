@@ -65,7 +65,7 @@ namespace Data
                     return "o";
                     break;
                 case STATE.NULL:
-                    return " ";
+                    return "_";
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
