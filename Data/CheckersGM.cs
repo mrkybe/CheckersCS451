@@ -11,27 +11,141 @@ namespace Data
     {
         private readonly Node[,] array = new Node[8, 8];
         private readonly Node[,] sparseArray = new Node[4, 8];
+        private List<Node> jumpedPieces = new List<Node>();
+        private Node activePiece = null;
+        private int turnNumber = 0;
+
+        public enum Player
+        {
+            PLAYER_RED,
+            PLAYER_BLACK
+        };
+
+        private Player currentPlayerTurn = Player.PLAYER_RED;
+
+        public Player MakeTurn(Point from, Point to)
+        {
+            Node nFrom = sparseArray[from.X, from.Y];
+            if (activePiece != null && nFrom != activePiece)
+            {
+                throw new Exception("Can't move this piece, must use locked piece instead");
+            }
+            Node nTo = sparseArray[to.X, to.Y];
+
+            var availableMoves = GetAvailableEmptyPositionsFor(from);
+            var availableJumps = GetAvailableJumps(from);
+
+            if (availableMoves.Contains(nTo))
+            {
+                // Actually move the piece
+                MovePiece(from, to);
+                return EndTurn();
+            }
+            else if (availableJumps.Contains(nTo))
+            {
+                // Jump the piece, check for available jumps, if there are any, don't switch players.
+                // Lock the player to only moving this piece
+                Point landingPosition = GetLandingPosition(from, to);
+                if (IsEmpty(landingPosition))
+                {
+                    MovePiece(from, landingPosition);
+                    jumpedPieces.Add(nTo);
+                }
+                else
+                {
+                    throw new Exception("Invalid Jump!");
+                }
+                var newAvailableJumps = GetAvailableJumps(landingPosition);
+                if (newAvailableJumps.Count == 0)
+                {
+                    return EndTurn();
+                }
+            }
+
+            // Check for stalemate, probably.
+            return currentPlayerTurn;
+        }
+
+        private Point GetLandingPosition(Point from, Point to)
+        {
+            Node nFrom = sparseArray[from.X, from.Y];
+            Node nTo = sparseArray[to.X, to.Y];
+            
+            var availableJumps = GetAvailableJumps(from);
+            if (!availableJumps.Contains(nTo))
+            {
+                throw new Exception("Invalid jump between 'from' and 'to' pieces.");
+            }
+
+            Point jumpeePos = nTo.GetSparsePosition();
+            Point fromPos = nFrom.GetSparsePosition();
+            int jumpVectorX = jumpeePos.X - fromPos.X;
+            int jumpVectorY = jumpeePos.Y - fromPos.Y;
+            Point jumpPos = new Point(jumpeePos.X + jumpVectorX, jumpeePos.Y + jumpVectorY);
+            return jumpPos;
+        }
+
+        private void MovePiece(Point from, Point to)
+        {
+            Node nFrom = sparseArray[from.X, from.Y];
+            Node nTo = sparseArray[to.X, to.Y];
+
+            if (nFrom.GetState() == EMPTY || nTo.GetState() != EMPTY)
+            {
+                throw new Exception("Bad move attempted!");
+            }
+
+            nTo.SetState(nFrom.GetState());
+            nFrom.SetState(EMPTY);
+        }
+
+        private Player EndTurn()
+        {
+            activePiece = null;
+            foreach (Node n in jumpedPieces)
+            {
+                n.SetState(EMPTY);
+            }
+            jumpedPieces.Clear();
+            turnNumber++;
+            if (currentPlayerTurn == Player.PLAYER_RED)
+            {
+                return Player.PLAYER_BLACK;
+            }
+            else
+            {
+                return Player.PLAYER_RED;
+            }
+        }
 
         public CheckersGM()
         {
             InitializeBoard();
             //PlacePieces();
-            PlaceTestPieces();
+            PlaceTestPiecesBasic();
 
             Console.WriteLine(DebugPrintArray());
             Console.WriteLine("\n");
             Console.WriteLine(DebugPrintSparseArray());
+            Console.WriteLine(DebugPrintNodes(GetAvailableEmptyPositionsFor(new Point(0, 0)), "EMPTY"));
+            Console.WriteLine(DebugPrintNodes(GetAvailableJumps(new Point(0, 0)), "JUMPS"));
+            MakeTurn(new Point(0, 0), new Point(1, 1));
+            Console.WriteLine(DebugPrintSparseArray());
             Console.WriteLine(DebugPrintNodes(GetAvailableEmptyPositionsFor(new Point(1, 1)), "EMPTY"));
             Console.WriteLine(DebugPrintNodes(GetAvailableJumps(new Point(1, 1)), "JUMPS"));
+
         }
 
-        private void PlaceTestPieces()
+        private void PlaceTestPiecesBasic()
         {
             PlacePiece(BLACK, 0, 0);
             PlacePiece(RED, 1, 1);
-            PlacePiece(BLACK, 0, 1);
-            PlacePiece(BLACK, 0, 2);
-            PlacePiece(BLACK, 2, 2);
+        }
+
+        private void PlaceTestPiecesKing()
+        {
+            PlacePiece(KING_BLACK, 2, 2);
+            PlacePiece(RED, 1, 1);
         }
 
         private string DebugPrintNodes(List<Node> points, string title = "")
@@ -96,7 +210,7 @@ namespace Data
                 return false;
             return sparseArray[pos.X, pos.Y].GetState() == EMPTY;
         }
-
+        
         private List<Node> GetAvailableJumps(Point pos)
         {
             Node n = sparseArray[pos.X, pos.Y];
