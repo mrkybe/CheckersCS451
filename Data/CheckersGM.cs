@@ -133,7 +133,8 @@ namespace Data
             Console.WriteLine(DebugPrintSparseArray());
             Console.WriteLine(DebugPrintNodes(GetAvailableEmptyPositionsFor(new Point(1, 1)), "EMPTY"));
             Console.WriteLine(DebugPrintNodes(GetAvailableJumps(new Point(1, 1)), "JUMPS"));
-
+            MakeTurn(new Point(2, 2), new Point(3, 3));
+            Console.WriteLine(DebugPrintSparseArray());
         }
 
         private void PlaceTestPiecesBasic()
@@ -365,13 +366,13 @@ namespace Data
                 for (var x = 0; x < 4; x++)
                 {
                     sparseArray[x, y].LinkTo(sparseArray[x, y + 1]);
-                    if (x != 3)
+                    if (x != 3 && y % 2 == 0)
                     {
                         sparseArray[x, y].LinkTo(sparseArray[x + 1, y + 1]);
                     }
-                    if (x != 0)
+                    if (x != 0 && y % 2 == 1)
                     {
-                        //sparseArray[x, y].LinkTo(sparseArray[x - 1, y + 1]);
+                        sparseArray[x, y].LinkTo(sparseArray[x - 1, y + 1]);
                     }
                 }
             }
