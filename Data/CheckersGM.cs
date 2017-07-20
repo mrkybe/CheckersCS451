@@ -79,7 +79,15 @@ namespace Data
 
             Point jumpeePos = nTo.GetSparsePosition();
             Point fromPos = nFrom.GetSparsePosition();
-            int jumpVectorX = jumpeePos.X - fromPos.X;
+            int jumpVectorX;
+            if (fromPos.Y % 2 == 0)
+            {
+                jumpVectorX = jumpeePos.X - fromPos.X;
+            }
+            else
+            {
+                jumpVectorX = jumpeePos.X - fromPos.X;
+            }
             int jumpVectorY = jumpeePos.Y - fromPos.Y;
             Point jumpPos = new Point(jumpeePos.X + jumpVectorX, jumpeePos.Y + jumpVectorY);
             return jumpPos;
