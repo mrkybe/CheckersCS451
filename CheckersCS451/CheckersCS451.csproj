@@ -74,6 +74,7 @@
     <EmbeddedResource Include="Resources\board.png" />
     <EmbeddedResource Include="Resources\piece_black.png" />
     <EmbeddedResource Include="Resources\piece_red.png" />
+    <EmbeddedResource Include="Resources\board_v2.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -82,6 +83,10 @@
     <ProjectReference Include="..\CheckerboardControl\CustomControls.csproj">
       <Project>{ce63ccc7-5dd2-43f5-b76f-eb0f7df0f480}</Project>
       <Name>CustomControls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Data\Data.csproj">
+      <Project>{FD62E364-61C8-4155-BE3B-C7FE514B82B3}</Project>
+      <Name>Data</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -442,14 +442,15 @@ namespace CheckersCS451
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
 			this.AutoScaleMode = AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(904, 805);
+			this.ClientSize = new System.Drawing.Size(904, 904);
 			this.Controls.Add(this.panel_game);
 			this.Controls.Add(this.menuStrip1);
-			this.FormBorderStyle = FormBorderStyle.FixedSingle;
+			this.FormBorderStyle = FormBorderStyle.Fixed3D;
+            this.SizeGripStyle = SizeGripStyle.Hide;
 			this.MainMenuStrip = this.menuStrip1;
 			this.Margin = new Padding(4);
 			this.Name = "Main";
-			this.Text = "Main";
+            this.Text = "Main";
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
 			this.panel_game.ResumeLayout(false);
