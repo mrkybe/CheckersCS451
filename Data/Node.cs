@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Data
 {
-    internal enum STATE
+    public enum State
     {
         RED,
         BLACK,
@@ -22,7 +22,7 @@ namespace Data
         private readonly List<Node> connectedNodes = new List<Node>();
         private Point normalCoords;
         private Point sparseCoords;
-        private STATE state = STATE.EMPTY;
+        private State state = State.EMPTY;
 
         public Node(Point normalCoords, Point sparseCoords)
         {
@@ -33,6 +33,11 @@ namespace Data
         public Point GetSparsePosition()
         {
             return new Point(sparseCoords.X, sparseCoords.Y);
+        }
+
+        public Point GetNormalPosition()
+        {
+            return new Point(normalCoords.X, normalCoords.Y);
         }
 
 
@@ -51,9 +56,9 @@ namespace Data
 
         public bool IsLinkedTo(Node n) { return connectedNodes.Contains(n); }
 
-        public void SetState(STATE s) { state = s; }
+        public void SetState(State s) { state = s; }
 
-        public STATE GetState() { return state; }
+        public State GetState() { return state; }
 
         public ReadOnlyCollection<Node> GetNeighbors() { return connectedNodes.AsReadOnly(); }
 
@@ -61,17 +66,17 @@ namespace Data
         {
             switch (state)
             {
-                case STATE.RED:
+                case State.RED:
                     return "r";
-                case STATE.BLACK:
+                case State.BLACK:
                     return "b";
-                case STATE.KING_RED:
+                case State.KING_RED:
                     return "R";
-                case STATE.KING_BLACK:
+                case State.KING_BLACK:
                     return "B";
-                case STATE.EMPTY:
-                    return "o";
-                case STATE.NULL:
+                case State.EMPTY:
+                    return ".";
+                case State.NULL:
                     return "_";
                 default:
                     throw new ArgumentOutOfRangeException();

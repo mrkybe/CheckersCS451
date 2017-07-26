@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
-using static Data.STATE;
+using static Data.State;
 
 namespace Data
 {
@@ -23,12 +23,33 @@ namespace Data
 
         private Player currentPlayerTurn = Player.PLAYER_RED;
 
+        public Player PieceToPlayer(State piece)
+        {
+            if (piece == BLACK || piece == KING_BLACK)
+            {
+                return Player.PLAYER_BLACK;
+            }
+            else if (piece == RED || piece == KING_RED)
+            {
+                return Player.PLAYER_RED;
+            }
+            else
+            {
+                throw new Exception("Invalid piece for matching to player, did you pass an empty space?");
+            }
+        }
+
         public Player MakeTurn(Point from, Point to)
         {
             Node nFrom = sparseArray[from.X, from.Y];
             if (activePiece != null && nFrom != activePiece)
             {
                 throw new Exception("Can't move this piece, must use locked piece instead");
+            }
+            if (PieceToPlayer(nFrom.GetState()) != currentPlayerTurn)
+            {
+                Console.WriteLine("Attempted to move piece of wrong player!");
+                return currentPlayerTurn;
             }
             Node nTo = sparseArray[to.X, to.Y];
 
@@ -60,6 +81,10 @@ namespace Data
                 {
                     return EndTurn();
                 }
+                else
+                {
+                    activePiece = sparseArray[landingPosition.X, landingPosition.Y];
+                }
             }
 
             // Check for stalemate, probably.
@@ -70,8 +95,18 @@ namespace Data
         {
             Node nFrom = sparseArray[from.X, from.Y];
             Node nTo = sparseArray[to.X, to.Y];
-            
-            var availableJumps = GetAvailableJumps(from);
+
+            var from_normal = nFrom.GetNormalPosition();
+            var to_normal = nTo.GetNormalPosition();
+
+            int jumpVectorXN = to_normal.X - from_normal.X;
+            int jumpVectorYN = to_normal.Y - from_normal.Y;
+
+            jumpVectorXN += to_normal.X;
+            jumpVectorYN += to_normal.Y;
+
+            return ToSparseXY(new Point(jumpVectorXN, jumpVectorYN));
+            /*var availableJumps = GetAvailableJumps(from);
             if (!availableJumps.Contains(nTo))
             {
                 throw new Exception("Invalid jump between 'from' and 'to' pieces.");
@@ -80,17 +115,29 @@ namespace Data
             Point jumpeePos = nTo.GetSparsePosition();
             Point fromPos = nFrom.GetSparsePosition();
             int jumpVectorX;
-            if (fromPos.Y % 2 == 0)
+            int jumpVectorY = jumpeePos.Y - fromPos.Y;
+            if (fromPos.Y % 2 != 0)
             {
                 jumpVectorX = jumpeePos.X - fromPos.X;
             }
             else
             {
-                jumpVectorX = jumpeePos.X - fromPos.X;
+                jumpVectorX = (jumpeePos.X - fromPos.X);
+                if (jumpVectorX == 1)
+                {
+                    jumpVectorX = 0;
+                }
+                else
+                {
+                    jumpVectorX = 1;
+                    if (jumpVectorY < 0)
+                    {
+                        jumpVectorX = jumpVectorX * -1;
+                    }
+                }
             }
-            int jumpVectorY = jumpeePos.Y - fromPos.Y;
             Point jumpPos = new Point(jumpeePos.X + jumpVectorX, jumpeePos.Y + jumpVectorY);
-            return jumpPos;
+            return jumpPos;*/
         }
 
         private void MovePiece(Point from, Point to)
@@ -109,6 +156,7 @@ namespace Data
 
         private Player EndTurn()
         {
+            Console.WriteLine("ENDING TURN!");
             activePiece = null;
             foreach (Node n in jumpedPieces)
             {
@@ -116,39 +164,58 @@ namespace Data
             }
             jumpedPieces.Clear();
             turnNumber++;
+            Player nextPlayer = currentPlayerTurn;
             if (currentPlayerTurn == Player.PLAYER_RED)
             {
-                return Player.PLAYER_BLACK;
+                nextPlayer = Player.PLAYER_BLACK;
             }
             else
             {
-                return Player.PLAYER_RED;
+                nextPlayer = Player.PLAYER_RED;
             }
+            currentPlayerTurn = nextPlayer;
+            return nextPlayer;
         }
 
         public CheckersGM()
         {
             InitializeBoard();
-            //PlacePieces();
-            PlaceTestPiecesBasic();
-
+            PlacePieces();
+            //PlaceTestPiecesBasic();
+            /*
             Console.WriteLine(DebugPrintArray());
-            Console.WriteLine("\n");
             Console.WriteLine(DebugPrintSparseArray());
-            Console.WriteLine(DebugPrintNodes(GetAvailableEmptyPositionsFor(new Point(0, 0)), "EMPTY"));
-            Console.WriteLine(DebugPrintNodes(GetAvailableJumps(new Point(0, 0)), "JUMPS"));
+            Console.WriteLine(activePiece == null ? "No active piece" : activePiece.GetStateString());
             MakeTurn(new Point(0, 0), new Point(1, 1));
+            Console.WriteLine(DebugPrintArray());
             Console.WriteLine(DebugPrintSparseArray());
-            Console.WriteLine(DebugPrintNodes(GetAvailableEmptyPositionsFor(new Point(1, 1)), "EMPTY"));
-            Console.WriteLine(DebugPrintNodes(GetAvailableJumps(new Point(1, 1)), "JUMPS"));
-            MakeTurn(new Point(2, 2), new Point(3, 3));
+            Console.WriteLine(DebugPrintNodes(GetAvailableEmptyPositionsFor(new Point(1, 2)), "EMPTY"));
+            Console.WriteLine(DebugPrintNodes(GetAvailableJumps(new Point(1, 2)), "JUMPS"));
+            Console.WriteLine(activePiece == null ? "No active piece" : activePiece.GetStateString());
+            MakeTurn(new Point(1, 2), new Point(2, 3));
+            Console.WriteLine(DebugPrintArray());
             Console.WriteLine(DebugPrintSparseArray());
+            Console.WriteLine(activePiece == null ? "No active piece" : activePiece.GetStateString());*/
+        }
+
+        public void DebugPrintFullBoard()
+        {
+            Console.WriteLine("--- " + turnNumber + " --- PLAYER: " + (currentPlayerTurn == Player.PLAYER_RED ? "RED" : "BLACK") + " -------------");
+            //Console.WriteLine(DebugPrintSparseArray());
+            Console.WriteLine(DebugPrintArray());
+        }
+
+        public void DebugPrintQueryNode(Point p)
+        {
+            Console.WriteLine(DebugPrintNodes(GetSpacesToCheck(p), "CONNECTIONS"));
+            Console.WriteLine(DebugPrintNodes(GetAvailableEmptyPositionsFor(p), "EMPTY"));
+            Console.WriteLine(DebugPrintNodes(GetAvailableJumps(p), "JUMPS"));
         }
 
         private void PlaceTestPiecesBasic()
         {
-            PlacePiece(BLACK, 0, 0);
-            PlacePiece(RED, 1, 1);
+            PlacePiece(BLACK, 1, 3);
+            PlacePiece(RED, 1, 4);
         }
 
         private void PlaceTestPiecesKing()
@@ -169,20 +236,26 @@ namespace Data
             return s;
         }
 
-        private ReadOnlyCollection<Node> GetSpacesToCheck(Point pos)
+        private List<Node> GetSpacesToCheck(Point pos)
         {
-            return sparseArray[pos.X, pos.Y].GetNeighbors();
+            var f = new List<Node>(sparseArray[pos.X, pos.Y].GetNeighbors());
+            return f;
         }
 
         private List<Node> GetAvailableEmptyPositionsFor(Node n)
         {
-            return GetAvailableEmptyPositionsFor(n.GetSparsePosition());   
+            return GetAvailableEmptyPositionsFor(n.GetSparsePosition());
+        }
+
+        private List<Node> GetAvailableEmptyPositionsForJumpingFor(Node n)
+        {
+            return GetAvailableEmptyPositionsForJumpingFor(n.GetSparsePosition());
         }
 
         private List<Node> GetAvailableEmptyPositionsFor(Point pos)
         {
             Node n = sparseArray[pos.X, pos.Y];
-            STATE piece = n.GetState();
+            State piece = n.GetState();
             var neighbors = GetSpacesToCheck(pos);
             if (piece == EMPTY)
             {
@@ -197,8 +270,8 @@ namespace Data
             }
             else if (piece == BLACK)
             {
-                return neighbors.Where(x => x.GetState() == EMPTY// &&
-                                            //x.GetSparsePosition().Y > n.GetSparsePosition().Y
+                return neighbors.Where(x => x.GetState() == EMPTY &&
+                                            x.GetSparsePosition().Y > n.GetSparsePosition().Y
                                             ).ToList();
             }
             else if (piece == KING_RED || piece == KING_BLACK)
@@ -208,6 +281,22 @@ namespace Data
             else
             {
                 throw new NullReferenceException("");
+            }
+        }
+
+        private List<Node> GetAvailableEmptyPositionsForJumpingFor(Point pos)
+        {
+            Node n = sparseArray[pos.X, pos.Y];
+            State piece = n.GetState();
+            var neighbors = GetSpacesToCheck(pos);
+            if (piece == EMPTY)
+            {
+                return new List<Node>();
+                // maybe we should throw an exception?  or actually return a list of empty neighbors?
+            }
+            else
+            { 
+                return neighbors.Where(x => x.GetState() == EMPTY).ToList();
             }
         }
 
@@ -223,7 +312,7 @@ namespace Data
         private List<Node> GetAvailableJumps(Point pos)
         {
             Node n = sparseArray[pos.X, pos.Y];
-            STATE piece = n.GetState();
+            State piece = n.GetState();
             var neighbors = GetSpacesToCheck(pos);
 
             List<Node> validJumps = new List<Node>();
@@ -236,14 +325,12 @@ namespace Data
             {
                 var candidates = neighbors.Where(x => (x.GetState() == BLACK || x.GetState() == KING_BLACK) &&
                                                        x.GetSparsePosition().Y < n.GetSparsePosition().Y &&
-                                                       GetAvailableEmptyPositionsFor(x).Count > 0
+                                                       GetAvailableEmptyPositionsForJumpingFor(x).Count > 0
                                                        ).ToList();
                 foreach (var candidate in candidates)
                 {
                     Point candidatePos = candidate.GetSparsePosition();
-                    int jumpVectorX = candidatePos.X - n.GetSparsePosition().X;
-                    int jumpVectorY = candidatePos.Y - n.GetSparsePosition().Y;
-                    Point jumpPos = new Point(candidatePos.X + jumpVectorX, candidatePos.Y + jumpVectorY);
+                    Point jumpPos = GetLandingPosition(n.GetSparsePosition(), candidatePos);
                     if (IsEmpty(jumpPos))
                     {
                         validJumps.Add(candidate);
@@ -255,14 +342,12 @@ namespace Data
             {
                 var candidates = neighbors.Where(x => (x.GetState() == RED || x.GetState() == KING_RED) &&
                                                        x.GetSparsePosition().Y > n.GetSparsePosition().Y &&
-                                                       GetAvailableEmptyPositionsFor(x).Count > 0
+                                                       GetAvailableEmptyPositionsForJumpingFor(x).Count > 0
                                                        ).ToList();
                 foreach (var candidate in candidates)
                 {
                     Point candidatePos = candidate.GetSparsePosition();
-                    int jumpVectorX = candidatePos.X - n.GetSparsePosition().X;
-                    int jumpVectorY = candidatePos.Y - n.GetSparsePosition().Y;
-                    Point jumpPos = new Point(candidatePos.X + jumpVectorX, candidatePos.Y + jumpVectorY);
+                    Point jumpPos = GetLandingPosition(n.GetSparsePosition(), candidatePos);
                     if (IsEmpty(jumpPos))
                     {
                         validJumps.Add(candidate);
@@ -273,14 +358,12 @@ namespace Data
             else if (piece == KING_RED)
             {
                 var candidates = neighbors.Where(x => (x.GetState() == BLACK || x.GetState() == KING_BLACK) &&
-                                                       GetAvailableEmptyPositionsFor(x).Count > 0
+                                                       GetAvailableEmptyPositionsForJumpingFor(x).Count > 0
                                                        ).ToList();
                 foreach (var candidate in candidates)
                 {
                     Point candidatePos = candidate.GetSparsePosition();
-                    int jumpVectorX = candidatePos.X - n.GetSparsePosition().X;
-                    int jumpVectorY = candidatePos.Y - n.GetSparsePosition().Y;
-                    Point jumpPos = new Point(candidatePos.X + jumpVectorX, candidatePos.Y + jumpVectorY);
+                    Point jumpPos = GetLandingPosition(n.GetSparsePosition(), candidatePos);
                     if (IsEmpty(jumpPos))
                     {
                         validJumps.Add(candidate);
@@ -291,14 +374,12 @@ namespace Data
             else if (piece == KING_BLACK)
             {
                 var candidates = neighbors.Where(x => (x.GetState() == RED || x.GetState() == KING_RED) &&
-                                                       GetAvailableEmptyPositionsFor(x).Count > 0
+                                                       GetAvailableEmptyPositionsForJumpingFor(x).Count > 0
                                                        ).ToList();
                 foreach (var candidate in candidates)
                 {
                     Point candidatePos = candidate.GetSparsePosition();
-                    int jumpVectorX = candidatePos.X - n.GetSparsePosition().X;
-                    int jumpVectorY = candidatePos.Y - n.GetSparsePosition().Y;
-                    Point jumpPos = new Point(candidatePos.X + jumpVectorX, candidatePos.Y + jumpVectorY);
+                    Point jumpPos = GetLandingPosition(n.GetSparsePosition(), candidatePos);
                     if (IsEmpty(jumpPos))
                     {
                         validJumps.Add(candidate);
@@ -312,13 +393,13 @@ namespace Data
         private bool CheckForStalemate() { return false; }
 
 
-        private void PlacePiece(STATE kind, int x, int y)
+        private void PlacePiece(State kind, int x, int y)
         {
             var n = sparseArray[x, y];
             n.SetState(kind);
         }
 
-        private void PlacePiece(STATE kind, Point pos)
+        private void PlacePiece(State kind, Point pos)
         {
             PlacePiece(kind, pos.X, pos.Y);
         }
@@ -332,11 +413,11 @@ namespace Data
                     var s = EMPTY;
                     if (y <= 2)
                     {
-                        s = RED;
+                        s = BLACK;
                     }
                     else if (y >= 5)
                     {
-                        s = BLACK;
+                        s = RED;
                     }
                     PlacePiece(s, x, y);
                 }
@@ -428,7 +509,7 @@ namespace Data
                     }
                     else if (x != -1)
                     {
-                        display += x + space;
+                        display += x/2 + space;
                     }
                 }
                 display += "\n\n";
