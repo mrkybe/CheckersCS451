@@ -191,8 +191,8 @@ namespace Data
         public CheckersGM()
         {
             InitializeBoard();
-            //PlacePieces();
-            PlaceTestPiecesBasic();
+            PlacePieces();
+            //PlaceTestPiecesBasic();
             /*
             Console.WriteLine(DebugPrintArray());
             Console.WriteLine(DebugPrintSparseArray());
@@ -242,9 +242,9 @@ namespace Data
             {
                 Point p = n.GetSparsePosition();
                 s += n.GetStateString() + "(" + p.X + ", " + p.Y + ")";
-                s += "\n";
+                s += " | ";
             }
-            return s;
+            return s + "\n";
         }
 
         private List<Node> GetSpacesToCheck(Point pos)
