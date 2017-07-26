@@ -71,6 +71,7 @@ namespace Data
                 {
                     MovePiece(from, landingPosition);
                     jumpedPieces.Add(nTo);
+                    nTo.SetState(EMPTY);  // TODO: make sure this is ok
                 }
                 else
                 {
@@ -150,7 +151,17 @@ namespace Data
                 throw new Exception("Bad move attempted!");
             }
 
-            nTo.SetState(nFrom.GetState());
+            State piece = nFrom.GetState();
+            if (nTo.GetSparsePosition().Y == 0 && currentPlayerTurn == Player.PLAYER_RED)
+            {
+                piece = KING_RED;
+            }
+            if (nTo.GetSparsePosition().Y == 7 && currentPlayerTurn == Player.PLAYER_BLACK)
+            {
+                piece = KING_BLACK;
+            }
+
+            nTo.SetState(piece);
             nFrom.SetState(EMPTY);
         }
 
@@ -180,8 +191,8 @@ namespace Data
         public CheckersGM()
         {
             InitializeBoard();
-            PlacePieces();
-            //PlaceTestPiecesBasic();
+            //PlacePieces();
+            PlaceTestPiecesBasic();
             /*
             Console.WriteLine(DebugPrintArray());
             Console.WriteLine(DebugPrintSparseArray());
@@ -214,8 +225,8 @@ namespace Data
 
         private void PlaceTestPiecesBasic()
         {
-            PlacePiece(BLACK, 1, 3);
-            PlacePiece(RED, 1, 4);
+            PlacePiece(KING_BLACK, 1, 6);
+            PlacePiece(KING_RED, 1, 4);
         }
 
         private void PlaceTestPiecesKing()
