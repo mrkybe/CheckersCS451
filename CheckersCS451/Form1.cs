@@ -12,8 +12,10 @@ namespace CheckersCS451
     public partial class Form1 : Form
     {
 
-        private Bitmap image_pieceRed, image_pieceBlack;
-        private EventHandler _finalizeLoadEvent = null;
+		private Bitmap image_pieceRed, image_pieceBlack;
+		private Bitmap image_kingRed , image_kingBlack;
+
+        private EventHandler _finalizeLoadEvent;
         // private 
 
         public Form1()
@@ -26,7 +28,7 @@ namespace CheckersCS451
             this.Size = this.ClientSize;
             this.MinimumSize = this.Size;
 
-            initHook();
+            InitHook();
 
             #region DEBUG_CODE
             // TODO: Prevent resize instead of slapping users in the 
@@ -44,16 +46,16 @@ namespace CheckersCS451
                                 (this.board.Height / this.board.RowCount) +
                                ")")));
 
-            this.newGameToolStripMenuItem.Click += (s, e) => dispDebugCellInfo();
+            this.newGameToolStripMenuItem.Click += (s, e) => DispDebugCellInfo();
             #endregion
 
             this.ResumeLayout();
 
-            this._finalizeLoadEvent = new EventHandler(this.finalizeForm);
+            this._finalizeLoadEvent = new EventHandler(this.FinalizeForm);
             this.Shown += this._finalizeLoadEvent;
         }
 
-        private void initHook()
+        private void InitHook()
         {
             try
             {
@@ -64,15 +66,16 @@ namespace CheckersCS451
                 Stream pcRed = exAss.GetManifestResourceStream("CheckersCS451.Resources.piece_red.png");
                 Stream pcBlk = exAss.GetManifestResourceStream("CheckersCS451.Resources.piece_black.png");
 
-				// Stream kgRed = exAss.GetManifestResourceStream("CheckersCS451.Resources.king_red.png");
-				// Stream kgBlk = exAss.GetManifestResourceStream("CheckersCS451.Resources.king_black.png");
+				Stream kgRed = exAss.GetManifestResourceStream("CheckersCS451.Resources.king_red.png");
+				Stream kgBlk = exAss.GetManifestResourceStream("CheckersCS451.Resources.king_black.png");
 
                 this.board.BackgroundImage = new Bitmap(bgImg);
+
                 this.image_pieceRed = new Bitmap(pcRed);
                 this.image_pieceBlack = new Bitmap(pcBlk);
 
-				// this.image_kingRed = new Bitmap(kgRed);
-				// this.image_kingBlack = new Bitmap(kgBlk);
+				this.image_kingRed = new Bitmap(kgRed);
+			    this.image_kingBlack = new Bitmap(kgBlk);
 			}
             catch (Exception e)
             {
@@ -82,7 +85,7 @@ namespace CheckersCS451
             }
         }
 
-        private void finalizeForm(object sender, EventArgs e)
+        private void FinalizeForm(object sender, EventArgs e)
         {
             // Remove finalizeLoadEvent to prevent it running more than once
             this.Shown -= this._finalizeLoadEvent;
@@ -118,10 +121,10 @@ namespace CheckersCS451
             this.board.ResumeLayout();
 
 
-            this.dispDebugCellInfo();
+            this.DispDebugCellInfo();
         }
 
-        private void dispDebugCellInfo()
+        private void DispDebugCellInfo()
         {
             //int cellSzX = this.board.Width / this.board.ColumnCount;
             //int cellSzY = this.board.Height / this.board.RowCount;
@@ -153,28 +156,58 @@ namespace CheckersCS451
             }
         }
 
-        private void update(Node[,] sparseArray)
+        public void Update(Node[,] sparseArray)
         {
             if (sparseArray == null || sparseArray.Length != 4)
             {
 
                 // TODO: Handle this in a better manner
 
-                String _err = "Malformed sparse array sent to Form1.repaint";
+                String _err = "Malformed sparse array sent to Form1.update";
                 Debug.WriteLine("Error: " + _err);
                 // throw new ArgumentException(_err);
             }
 
             for (int row = 0; row < this.board.RowCount; row++) {
+                
+                int sparseCol = 0;
                 for (int col = 0; col < this.board.ColumnCount; col++)
-                {
+				{
+					if ((col - (row % 2 == 0 ? 1 : 0)) % 2 != 0)
+					{
+						continue;
+					}
+
                     Control cell = this.board.GetControlFromPosition(col, row);
 
-                    if (cell == null) {
+                    if (cell == null)
+                    {
+                        continue;
                         // Wut?
                     }
 
+                    State cellState = (sparseArray[sparseCol, row]).GetState();
 
+                    switch (cellState)
+					{
+						case State.RED:
+                            cell.BackgroundImage = image_pieceRed;
+							break;
+						case State.KING_RED:
+							cell.BackgroundImage = image_kingRed;
+							break;
+						case State.BLACK:
+							cell.BackgroundImage = image_pieceBlack;
+							break;
+						case State.KING_BLACK:
+							cell.BackgroundImage = image_kingBlack;
+							break;
+                        default: // Implied: State.EMPTY
+                            cell.BackgroundImage = null;
+                            break;
+                    }
+
+                    sparseCol++;
                 }
             }
         }
