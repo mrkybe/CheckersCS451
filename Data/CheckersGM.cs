@@ -21,6 +21,11 @@ namespace Data
             PLAYER_BLACK
         };
 
+		public int Turn
+		{
+			get { return this.turnNumber; }
+		}
+
         private Player currentPlayerTurn = Player.PLAYER_RED;
 
         public Player PieceToPlayer(State piece)

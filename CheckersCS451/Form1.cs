@@ -16,7 +16,9 @@ namespace CheckersCS451
 		private Bitmap image_kingRed , image_kingBlack;
 
         private EventHandler _finalizeLoadEvent;
-        // private 
+
+        private CheckersGM _game;
+        private Boolean _first;
 
         public Form1()
         {
@@ -46,7 +48,7 @@ namespace CheckersCS451
                                 (this.board.Height / this.board.RowCount) +
                                ")")));
 
-            this.newGameToolStripMenuItem.Click += (s, e) => DispDebugCellInfo();
+            // this.newGameToolStripMenuItem.Click += (s, e) => DispDebugCellInfo();
             #endregion
 
             this.ResumeLayout();
@@ -64,7 +66,7 @@ namespace CheckersCS451
                 Stream bgImg = exAss.GetManifestResourceStream("CheckersCS451.Resources.board_v2.png");
 
                 Stream pcRed = exAss.GetManifestResourceStream("CheckersCS451.Resources.piece_red.png");
-                Stream pcBlk = exAss.GetManifestResourceStream("CheckersCS451.Resources.piece_black.png");
+                Stream pcBlk = exAss.GetManifestResourceStream("CheckersCS451.Resources.piece_black2.png");
 
 				Stream kgRed = exAss.GetManifestResourceStream("CheckersCS451.Resources.king_red.png");
 				Stream kgBlk = exAss.GetManifestResourceStream("CheckersCS451.Resources.king_black.png");
@@ -90,19 +92,6 @@ namespace CheckersCS451
             // Remove finalizeLoadEvent to prevent it running more than once
             this.Shown -= this._finalizeLoadEvent;
 
-
-    //Me.TableLayoutPanel1.SuspendLayout()
-    //For column = 0 To Me.TableLayoutPanel1.RowCount - 1
-    //  Me.TableLayoutPanel1.ColumnStyles.Add(New RowStyle(SizeType.AutoSize, 100))
-    //  For row = 0 To Me.TableLayoutPanel1.RowCount - 1
-    //    Me.TableLayoutPanel1.RowStyles.Add(New RowStyle(SizeType.AutoSize, 100))
-    //    Dim lblLabel As New Label()
-    //    lblLabel.Text = "Label: " + row.ToString() + column.ToString
-    //    Me.TableLayoutPanel1.Controls.Add(lblLabel, column, row)
-    //  Next row
-    //Next column
-    //Me.TableLayoutPanel1.ResumeLayout()
-
             this.board.SuspendLayout();
 
             for (int row = 0; row < this.board.RowCount; row++) {
@@ -120,39 +109,68 @@ namespace CheckersCS451
 
             this.board.ResumeLayout();
 
-
-            this.DispDebugCellInfo();
+            this.SetupPieces();
         }
 
-        private void DispDebugCellInfo()
+        private void SetupPieces()
         {
-            //int cellSzX = this.board.Width / this.board.ColumnCount;
-            //int cellSzY = this.board.Height / this.board.RowCount;
-
-            //int baseX = this.board.Location.X;
-            //int baseY = this.board.Location.Y;
-
-            //for (int row = (cellSzY / 2); row < this.board.Height; row += cellSzY)
-            //{
-            //    for (int col = (cellSzX / 2); col < this.board.Height; col += cellSzX)
-            //    {
-            //        Control cell = this.board.GetControlFromPosition(col + baseX, row + baseY);
-
-            //        int DEBUG_ROW = (row - (cellSzY / 2)) / cellSzY;
-            //        int DEBUG_COL = (col - (cellSzX / 2)) / cellSzX;
-
-            //        //	cell.Text = String.Format("r{0}c{1}", DEBUG_ROW, DEBUG_COL);
-            //    }
-            //}
-
             for (int row = 0; row < this.board.RowCount; row++) {
                 for (int col = 0; col < this.board.ColumnCount; col++)
                 {
                     Control cell = this.board.GetControlFromPosition(col, row);
 
-                    Debug.WriteLineIf(cell == null, String.Format("No cell at r{0}c{1}", row, col) as object);
-					cell.Text = String.Format("r{0}c{1}", row, col);
+                    if (cell == null) 
+                    {
+                        continue;
+                    }
+
+                    cell.BackColor = Color.Transparent;
+                    cell.Dock = DockStyle.Fill;
+
+                    Image img = null;
+                    Boolean flip = _game != null && 
+                                    (_game.GetTurn() % 2 == 0) != this._first;
+
+					if ((row % 2 == 0) ^ (col % 2 == 0))
+					{
+                        if (row < 3) {
+                            if (!flip)
+                                img = this.image_pieceBlack;
+                            else
+                                img = this.image_pieceRed;
+						}
+						else if (row > 4)
+						{
+							if (!flip)
+							    img = this.image_pieceRed;
+							else
+								img = this.image_pieceBlack;
+                        } else {
+                            img = null;
+                        }
+					}
+
+                    cell.BackgroundImage = img;
+                    cell.BackgroundImageLayout = ImageLayout.Center;
+
+                    cell.MouseClick += (s, e) => this.ProcessClick(s, e);
 				}
+            }
+        }
+
+        private void ProcessClick(object sender, MouseEventArgs e)
+        {
+            if (this._game == null)
+            {
+                return;
+            }
+
+            // If turn % 2 == 0, we're playing as the first player.
+            // If we're not the first player, we don't play.
+            // I.e. turn % 2 == this._first ^ 1
+			if ((this._game.GetTurn() % 2 == 0) != this._first)
+            {
+                return;
             }
         }
 
