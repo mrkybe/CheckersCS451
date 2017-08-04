@@ -26,6 +26,11 @@ namespace Data
 			get { return this.turnNumber; }
 		}
 
+		public Node[,] SparseArray
+		{
+			get { return this.sparseArray; }
+		}
+
         private Player currentPlayerTurn = Player.PLAYER_RED;
 
         public Player PieceToPlayer(State piece)

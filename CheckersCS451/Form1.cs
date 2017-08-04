@@ -128,8 +128,7 @@ namespace CheckersCS451
                     cell.Dock = DockStyle.Fill;
 
                     Image img = null;
-                    Boolean flip = _game != null && 
-                                    (_game.GetTurn() % 2 == 0) != this._first;
+                    Boolean flip = _game != null && (_game.Turn % 2 == 0) != this._first;
 
 					if ((row % 2 == 0) ^ (col % 2 == 0))
 					{
@@ -168,14 +167,23 @@ namespace CheckersCS451
             // If turn % 2 == 0, we're playing as the first player.
             // If we're not the first player, we don't play.
             // I.e. turn % 2 == this._first ^ 1
-			if ((this._game.GetTurn() % 2 == 0) != this._first)
+			if ((this._game.Turn % 2 == 0) != this._first)
             {
                 return;
             }
+
+            Point click = e.Location;
+            click.Offset(new Point(-this.board.Location.X, -this.board.Location.Y));
+
+            // this.board.GetControlFromPosition((click.X - click.X % this.board.Width / this.board.ColumnCount) / (this.board.Width * this.board.ColumnCount));
+			// Control cell = this.board.GetControlFromPosition(col, row);
         }
 
-        public void Update(Node[,] sparseArray)
+        public void Update(CheckersGM newState)
         {
+            this._game = newState;
+            Node[,] sparseArray = this._game.SparseArray;
+
             if (sparseArray == null || sparseArray.Length != 4)
             {
 
