@@ -34,8 +34,9 @@ namespace CheckersCS451
 		private void InitializeComponent()
 		{
 			this.menuStrip1 = new MenuStrip();
-			this.newGameToolStripMenuItem = new ToolStripMenuItem();
-			this.text_gameInfo = new ToolStripTextBox();
+			this.connectToolStripMenuItem = new ToolStripMenuItem();
+			this.box_serverIP = new ToolStripTextBox();
+			this.box_serverPT = new ToolStripTextBox();
 			this.panel_game = new Panel();
 			this.table_rhs_split = new TableLayoutPanel();
 			this.board = new TableLayoutPanel();
@@ -71,8 +72,9 @@ namespace CheckersCS451
 			// 
 			this.menuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
 			this.menuStrip1.Items.AddRange(new ToolStripItem[] {
-			this.newGameToolStripMenuItem,
-			this.text_gameInfo});
+			this.connectToolStripMenuItem,
+			this.box_serverIP, 
+            this.box_serverPT});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
 			this.menuStrip1.Padding = new Padding(8, 2, 0, 2);
@@ -80,23 +82,35 @@ namespace CheckersCS451
 			this.menuStrip1.TabIndex = 1;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
-			// newGameToolStripMenuItem
+			// connectToolStripMenuItem
 			// 
-			this.newGameToolStripMenuItem.Name = "newGameToolStripMenuItem";
-			this.newGameToolStripMenuItem.Size = new System.Drawing.Size(149, 39);
-			this.newGameToolStripMenuItem.Text = "New Game";
+			this.connectToolStripMenuItem.Name = "connectToolStripMenuItem";
+			this.connectToolStripMenuItem.Size = new System.Drawing.Size(149, 39);
+			this.connectToolStripMenuItem.Text = "Connect";
+            // 
+            // box_serverIP
+            // 
+            this.box_serverIP.Alignment = ToolStripItemAlignment.Right;
+			this.box_serverIP.BorderStyle = BorderStyle.None;
+			this.box_serverIP.Name = "box_serverIP";
+			this.box_serverIP.Overflow = ToolStripItemOverflow.Never;
+            this.box_serverIP.ReadOnly = false;
+			this.box_serverIP.RightToLeft = RightToLeft.Yes;
+			this.box_serverIP.ShortcutsEnabled = false;
+			this.box_serverIP.Size = new System.Drawing.Size(317, 39);
+			this.box_serverIP.Text = "Server IP";
+            // 
+			// box_serverPT
 			// 
-			// text_gameInfo
-			// 
-			this.text_gameInfo.Alignment = ToolStripItemAlignment.Right;
-			this.text_gameInfo.BorderStyle = BorderStyle.None;
-			this.text_gameInfo.Name = "text_gameInfo";
-			this.text_gameInfo.Overflow = ToolStripItemOverflow.Never;
-			this.text_gameInfo.ReadOnly = true;
-			this.text_gameInfo.RightToLeft = RightToLeft.Yes;
-			this.text_gameInfo.ShortcutsEnabled = false;
-			this.text_gameInfo.Size = new System.Drawing.Size(633, 39);
-			this.text_gameInfo.Text = "{{Game.Information}}";
+			this.box_serverPT.Alignment = ToolStripItemAlignment.Right;
+			this.box_serverPT.BorderStyle = BorderStyle.None;
+			this.box_serverPT.Name = "box_serverPT";
+			this.box_serverPT.Overflow = ToolStripItemOverflow.Never;
+            this.box_serverPT.ReadOnly = false;
+			this.box_serverPT.RightToLeft = RightToLeft.Yes;
+			this.box_serverPT.ShortcutsEnabled = false;
+			this.box_serverPT.Size = new System.Drawing.Size(316, 39);
+			this.box_serverPT.Text = "Server Port";
 			// 
 			// panel_game
 			// 
@@ -471,9 +485,9 @@ namespace CheckersCS451
 		private TableLayoutPanel board;
 
 		private MenuStrip menuStrip1;
-		private ToolStripMenuItem newGameToolStripMenuItem;
+		private ToolStripMenuItem connectToolStripMenuItem;
 		private Panel panel_game;
-		private ToolStripTextBox text_gameInfo;
+		private ToolStripTextBox box_serverIP, box_serverPT;
 
 		private TableLayoutPanel table_rhs_split;
 		private TableLayoutPanel table_top;

@@ -31,6 +31,10 @@ namespace Data
 			get { return this.sparseArray; }
 		}
 
+        public Player CurrentPlayerTurn {
+            get { return this.currentPlayerTurn; }
+        }
+
         private Player currentPlayerTurn = Player.PLAYER_RED;
 
         public Player PieceToPlayer(State piece)

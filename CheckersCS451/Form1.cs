@@ -37,24 +37,29 @@ namespace CheckersCS451
             // face with a snap-back for the window size
             this.Resize += (s, e) => this.Size = new Size(702, 746);
 
-            this.text_gameInfo.Text = (
-                String.Concat((this.Width + " x " + this.Height),
-                              "  |  ",
-                              (this.board.Width + " x " + this.board.Height),
-                              "  |  ",
-                              ("CELL SZ: (" +
-                                (this.board.Width / this.board.ColumnCount) +
-                                " x " +
-                                (this.board.Height / this.board.RowCount) +
-                               ")")));
+            //this.text_gameInfo.Text = (
+                //String.Concat((this.Width + " x " + this.Height),
+                              //"  |  ",
+                              //(this.board.Width + " x " + this.board.Height),
+                              //"  |  ",
+                              //("CELL SZ: (" +
+                               // (this.board.Width / this.board.ColumnCount) +
+                               // " x " +
+                               // (this.board.Height / this.board.RowCount) +
+                               //")")));
 
-            // this.newGameToolStripMenuItem.Click += (s, e) => DispDebugCellInfo();
+            this.connectToolStripMenuItem.Click += (s, e) => Connect(s, e);
             #endregion
 
             this.ResumeLayout();
 
             this._finalizeLoadEvent = new EventHandler(this.FinalizeForm);
             this.Shown += this._finalizeLoadEvent;
+        }
+
+        private void Connect(object s, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private void InitHook()
