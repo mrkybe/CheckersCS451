@@ -11,15 +11,23 @@ namespace Data
     {
         private readonly Node[,] array = new Node[8, 8];
         private readonly Node[,] sparseArray = new Node[4, 8];
+        private readonly List<Node> nodes = new List<Node>();
         private List<Node> jumpedPieces = new List<Node>();
         private Node activePiece = null;
         private int turnNumber = 0;
+        private GameState gameState = GameState.PLAY;
 
         public enum Player
         {
             PLAYER_RED,
-            PLAYER_BLACK
+            PLAYER_BLACK,
+            NULL
         };
+
+        public enum GameState
+        {
+            PLAY, STALEMATE, RED_WIN, BLACK_WIN            
+        }
 
         private Player currentPlayerTurn = Player.PLAYER_RED;
 
@@ -35,7 +43,8 @@ namespace Data
             }
             else
             {
-                throw new Exception("Invalid piece for matching to player, did you pass an empty space?");
+                return Player.NULL;
+                //throw new Exception("Invalid piece for matching to player, did you pass an empty space?");
             }
         }
 
@@ -106,38 +115,28 @@ namespace Data
             jumpVectorYN += to_normal.Y;
 
             return ToSparseXY(new Point(jumpVectorXN, jumpVectorYN));
-            /*var availableJumps = GetAvailableJumps(from);
-            if (!availableJumps.Contains(nTo))
-            {
-                throw new Exception("Invalid jump between 'from' and 'to' pieces.");
-            }
+        }
 
-            Point jumpeePos = nTo.GetSparsePosition();
-            Point fromPos = nFrom.GetSparsePosition();
-            int jumpVectorX;
-            int jumpVectorY = jumpeePos.Y - fromPos.Y;
-            if (fromPos.Y % 2 != 0)
+        private void CheckThatMovesAreAvailable()
+        {
+            var pieces = nodes.Where(x => PieceToPlayer(x.GetState()) == currentPlayerTurn);
+            List<Node> availableMoves = new List<Node>();
+            foreach (var piece in pieces)
             {
-                jumpVectorX = jumpeePos.X - fromPos.X;
+                availableMoves.AddRange(GetAvailableEmptyPositionsFor(piece));
+                availableMoves.AddRange(GetAvailableJumps(piece.GetSparsePosition()));
             }
-            else
+            if (availableMoves.Count == 0)
             {
-                jumpVectorX = (jumpeePos.X - fromPos.X);
-                if (jumpVectorX == 1)
+                if (currentPlayerTurn == Player.PLAYER_BLACK)
                 {
-                    jumpVectorX = 0;
+                    gameState = GameState.RED_WIN;
                 }
                 else
                 {
-                    jumpVectorX = 1;
-                    if (jumpVectorY < 0)
-                    {
-                        jumpVectorX = jumpVectorX * -1;
-                    }
+                    gameState = GameState.BLACK_WIN;
                 }
             }
-            Point jumpPos = new Point(jumpeePos.X + jumpVectorX, jumpeePos.Y + jumpVectorY);
-            return jumpPos;*/
         }
 
         private void MovePiece(Point from, Point to)
@@ -174,14 +173,15 @@ namespace Data
                 nextPlayer = Player.PLAYER_RED;
             }
             currentPlayerTurn = nextPlayer;
+            CheckThatMovesAreAvailable();
             return nextPlayer;
         }
 
         public CheckersGM()
         {
             InitializeBoard();
-            PlacePieces();
-            //PlaceTestPiecesBasic();
+            //PlacePieces();
+            PlaceTestPiecesBasic();
             /*
             Console.WriteLine(DebugPrintArray());
             Console.WriteLine(DebugPrintSparseArray());
@@ -200,7 +200,16 @@ namespace Data
 
         public void DebugPrintFullBoard()
         {
-            Console.WriteLine("--- " + turnNumber + " --- PLAYER: " + (currentPlayerTurn == Player.PLAYER_RED ? "RED" : "BLACK") + " -------------");
+            string gameStateString = "PLAYING";
+            if (gameState == GameState.RED_WIN)
+            {
+                gameStateString = "RED WIN";
+            }
+            else if (gameState == GameState.BLACK_WIN)
+            {
+                gameStateString = "BLACK WIN";
+            }
+            Console.WriteLine("--- " + turnNumber + " --- PLAYER: " + (currentPlayerTurn == Player.PLAYER_RED ? "RED" : "BLACK") + " ------------- " + (gameStateString));
             //Console.WriteLine(DebugPrintSparseArray());
             Console.WriteLine(DebugPrintArray());
         }
@@ -214,8 +223,9 @@ namespace Data
 
         private void PlaceTestPiecesBasic()
         {
-            PlacePiece(BLACK, 1, 3);
-            PlacePiece(RED, 1, 4);
+            PlacePiece(BLACK, 3, 0);
+            PlacePiece(RED, 3, 2);
+            PlacePiece(RED, 2, 2);
         }
 
         private void PlaceTestPiecesKing()
@@ -442,6 +452,7 @@ namespace Data
                             throw new Exception("OOPS");
                         }
                         sparseArray[sparseCoords.X, sparseCoords.Y] = n;
+                        nodes.Add(n);
                     }
                 }
             }

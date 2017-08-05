@@ -17,7 +17,7 @@ namespace Data
         NULL
     }
 
-    internal class Node
+    public class Node
     {
         private readonly List<Node> connectedNodes = new List<Node>();
         private Point normalCoords;
