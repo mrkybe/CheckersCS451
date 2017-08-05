@@ -75,6 +75,7 @@
     <EmbeddedResource Include="Resources\piece_black.png" />
     <EmbeddedResource Include="Resources\piece_red.png" />
     <EmbeddedResource Include="Resources\board_v2.png" />
+    <EmbeddedResource Include="Resources\piece_black2.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
