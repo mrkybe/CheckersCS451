@@ -72,23 +72,17 @@ namespace CheckersCS451
                 clientSocket.Connect(ipAddress, 1337);
 
                 NetworkStream serverStream = new NetworkStream(clientSocket);
-                Turn test = new Turn(new Point(1,3), new Point(3,4), true );
-                BinaryFormatter f = new BinaryFormatter();
-                byte[] outStream;
 
-                using (var ms = new MemoryStream())
-                {
-                    f.Serialize(ms, test);
-                    outStream = ms.ToArray();
-                }
+                Turn test = new Turn(new Point(1,3), new Point(3,4), true );
+                byte[] outStream = test.ToBytes();
 
                 serverStream.Write(outStream, 0, outStream.Length);
                 serverStream.Flush();
 
                 byte[] inStream = new byte[10025];
                 serverStream.Read(inStream, 0, inStream.Length);
-                string returndata = System.Text.Encoding.ASCII.GetString(inStream);
-                MessageBox.Show(returndata);
+                Turn result = Turn.FromBytes(inStream);
+                MessageBox.Show(result.ToString());
             }
             catch (Exception ex)
             {

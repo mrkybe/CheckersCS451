@@ -41,19 +41,12 @@ namespace CheckersServer
                     NetworkStream networkStream = new NetworkStream(mySocket);
                     networkStream.Read(bytesFrom, 0, bytesFrom.Length);
 
-                    using (var memStream = new MemoryStream())
-                    {
-                        var binForm = new BinaryFormatter();
-                        memStream.Write(bytesFrom, 0, bytesFrom.Length);
-                        memStream.Seek(0, SeekOrigin.Begin);
-                        Turn obj = (Turn)binForm.Deserialize(memStream);
-                        Console.WriteLine(obj.ToString());
-                    }
+                    Turn obj = Turn.FromBytes(bytesFrom);
+                    Console.WriteLine(obj.ToString());
 
-                    sendBytes = Encoding.ASCII.GetBytes(serverResponse);
+                    sendBytes = obj.ToBytes();
                     networkStream.Write(sendBytes, 0, sendBytes.Length);
                     networkStream.Flush();
-                    Console.WriteLine(" >> " + serverResponse);
                 }
                 catch (IOException ex)
                 {
