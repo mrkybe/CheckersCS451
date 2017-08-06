@@ -24,6 +24,8 @@ namespace CheckersCS451
         private CheckersGM _game;
         private Boolean _first;
 
+        private Socket clientSocket;
+
         public Form1()
         {
             InitializeComponent();
@@ -65,29 +67,49 @@ namespace CheckersCS451
         {
             try
             {
-                Socket clientSocket = new Socket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
+                clientSocket = new Socket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
 
                 IPHostEntry ipHostInfo = Dns.GetHostEntry("");
                 IPAddress ipAddress = ipHostInfo.AddressList[0];
                 clientSocket.Connect(ipAddress, 1337);
 
-                NetworkStream serverStream = new NetworkStream(clientSocket);
-
                 Turn test = new Turn(new Point(1,3), new Point(3,4), true );
-                byte[] outStream = test.ToBytes();
+                SendTurn(test);
 
-                serverStream.Write(outStream, 0, outStream.Length);
-                serverStream.Flush();
-
-                byte[] inStream = new byte[10025];
-                serverStream.Read(inStream, 0, inStream.Length);
-                Turn result = Turn.FromBytes(inStream);
-                MessageBox.Show(result.ToString());
+                CheckersGM result = GetBoardState();
+                MessageBox.Show(result.DebugPrintSparseArray());
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
             }
+        }
+
+        private void SendTurn(Turn turn)
+        {
+            NetworkStream serverStream = new NetworkStream(clientSocket);
+
+            byte[] outStream = turn.ToBytes();
+
+            serverStream.Write(outStream, 0, outStream.Length);
+            serverStream.Flush();
+        }
+
+        private CheckersGM GetBoardState()
+        {
+            CheckersGM board;
+
+            NetworkStream serverStream = new NetworkStream(clientSocket);
+
+            byte[] inStream = new byte[81920];
+            serverStream.Read(inStream, 0, inStream.Length);
+            if (serverStream.DataAvailable)
+            {
+                throw new Exception("oh no");
+            }
+            board = CheckersGM.FromBytes(inStream);
+
+            return board;
         }
 
         private void InitHook()

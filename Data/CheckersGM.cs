@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using static Data.State;
 
 namespace Data
 {
+    [Serializable]
     public class CheckersGM : Game
     {
         private readonly Node[,] array = new Node[8, 8];
@@ -629,6 +632,28 @@ namespace Data
                 }
             }
             return display;
+        }
+
+        public static CheckersGM FromBytes(byte[] bytes)
+        {
+            using (var memStream = new MemoryStream())
+            {
+                var binForm = new BinaryFormatter();
+                memStream.Write(bytes, 0, bytes.Length);
+                memStream.Seek(0, SeekOrigin.Begin);
+                var obj = (CheckersGM)binForm.Deserialize(memStream);
+                return obj;
+            }
+        }
+
+        public byte[] ToBytes()
+        {
+            BinaryFormatter f = new BinaryFormatter();
+            using (var ms = new MemoryStream())
+            {
+                f.Serialize(ms, this);
+                return ms.ToArray();
+            }
         }
     }
 }

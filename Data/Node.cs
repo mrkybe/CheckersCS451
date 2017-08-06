@@ -17,6 +17,7 @@ namespace Data
         NULL
     }
 
+    [Serializable]
     public class Node
     {
         private readonly List<Node> connectedNodes = new List<Node>();

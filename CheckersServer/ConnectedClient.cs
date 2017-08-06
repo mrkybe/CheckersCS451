@@ -44,7 +44,7 @@ namespace CheckersServer
                     Turn obj = Turn.FromBytes(bytesFrom);
                     Console.WriteLine(obj.ToString());
 
-                    sendBytes = obj.ToBytes();
+                    sendBytes = gameBoard.ToBytes();
                     networkStream.Write(sendBytes, 0, sendBytes.Length);
                     networkStream.Flush();
                 }
