@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Net.Sockets;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using Data;
@@ -24,30 +26,40 @@ namespace CheckersServer
         private void DoConnection()
         {
             int requestCount = 0;
-            byte[] bytesFrom = new byte[10025];
+            byte[] bytesFrom = new byte[10000];
             string dataFromClient = null;
             Byte[] sendBytes = null;
-            string serverResponse = null;
+            string serverResponse = "SUP";
             string rCount = null;
             requestCount = 0;
 
-            while ((true))
+            while (true)
             {
                 try
                 {
                     requestCount = requestCount + 1;
                     NetworkStream networkStream = new NetworkStream(mySocket);
-                    networkStream.Read(bytesFrom, 0, (int)mySocket.ReceiveBufferSize);
-                    dataFromClient = System.Text.Encoding.ASCII.GetString(bytesFrom);
-                    dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("$"));
-                    Console.WriteLine(" >> " + "From client-" + clientString + dataFromClient);
+                    networkStream.Read(bytesFrom, 0, bytesFrom.Length);
 
-                    rCount = Convert.ToString(requestCount);
-                    serverResponse = "Server to clinet(" + clientString + ") " + rCount;
+                    using (var memStream = new MemoryStream())
+                    {
+                        var binForm = new BinaryFormatter();
+                        memStream.Write(bytesFrom, 0, bytesFrom.Length);
+                        memStream.Seek(0, SeekOrigin.Begin);
+                        Turn obj = (Turn)binForm.Deserialize(memStream);
+                        Console.WriteLine(obj.ToString());
+                    }
+
                     sendBytes = Encoding.ASCII.GetBytes(serverResponse);
                     networkStream.Write(sendBytes, 0, sendBytes.Length);
                     networkStream.Flush();
                     Console.WriteLine(" >> " + serverResponse);
+                }
+                catch (IOException ex)
+                {
+                    Console.WriteLine(" >> " + ex.ToString());
+                    Console.WriteLine(" Killing this thread - " + clientString);
+                    break;
                 }
                 catch (Exception ex)
                 {

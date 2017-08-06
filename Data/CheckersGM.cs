@@ -29,6 +29,9 @@ namespace Data
             PLAY, STALEMATE, RED_WIN, BLACK_WIN            
         }
 
+        public int Turn => turnNumber;
+        public Node[,] SparseArray => sparseArray;
+
         private Player currentPlayerTurn = Player.PLAYER_RED;
 
         public Player PieceToPlayer(State piece)
@@ -48,8 +51,10 @@ namespace Data
             }
         }
 
-        public Player MakeTurn(Point from, Point to)
+        public Player MakeTurn(Turn turn)
         {
+            Point from = turn.From;
+            Point to = turn.To;
             Node nFrom = sparseArray[from.X, from.Y];
             if (activePiece != null && nFrom != activePiece)
             {

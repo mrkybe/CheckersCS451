@@ -2,7 +2,11 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Net;
+using System.Net.Sockets;
 using System.Reflection;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
 using Data;
 
@@ -59,7 +63,37 @@ namespace CheckersCS451
 
         private void Connect(object s, EventArgs e)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Socket clientSocket = new Socket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
+
+                IPHostEntry ipHostInfo = Dns.GetHostEntry("");
+                IPAddress ipAddress = ipHostInfo.AddressList[0];
+                clientSocket.Connect(ipAddress, 1337);
+
+                NetworkStream serverStream = new NetworkStream(clientSocket);
+                Turn test = new Turn(new Point(1,3), new Point(3,4), true );
+                BinaryFormatter f = new BinaryFormatter();
+                byte[] outStream;
+
+                using (var ms = new MemoryStream())
+                {
+                    f.Serialize(ms, test);
+                    outStream = ms.ToArray();
+                }
+
+                serverStream.Write(outStream, 0, outStream.Length);
+                serverStream.Flush();
+
+                byte[] inStream = new byte[10025];
+                serverStream.Read(inStream, 0, inStream.Length);
+                string returndata = System.Text.Encoding.ASCII.GetString(inStream);
+                MessageBox.Show(returndata);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
 
         private void InitHook()

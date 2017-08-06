@@ -26,11 +26,11 @@ namespace CheckersServer
         {
             int clientCount = 0;
 
-            IPHostEntry ipHostInfo = Dns.GetHostEntry("localhost");
+            IPHostEntry ipHostInfo = Dns.GetHostEntry("");
             IPAddress ipAddress = ipHostInfo.AddressList[0];
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 1337);
 
-            Socket listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            Socket listener = new Socket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
             try
             {
                 listener.Bind(localEndPoint);
@@ -42,15 +42,18 @@ namespace CheckersServer
                     Console.WriteLine("Waiting for a connection...");
                     // Program is suspended while waiting for an incoming connection.  
                     Socket handler = listener.Accept();
+                    Console.WriteLine("  Connection recieved, spinning up ConnectClient thread");
                     CheckersGM gameBoard;
                     if (clientCount % 2 == 0)
                     {
                         gameBoard = new CheckersGM();
                         games.Add(gameBoard);
+                        Console.WriteLine("  Even connected client count, creating new gameboard");
                     }
                     else
                     {
                         gameBoard = games.Last();
+                        Console.WriteLine("  Odd connected client count, matching to last gameboard");
                     }
                     clientCount++;
                     ConnectedClient client = new ConnectedClient(handler, gameBoard,  clientCount.ToString());
@@ -79,7 +82,7 @@ namespace CheckersServer
                     gm.DebugPrintQueryNode(res.Item1);
                     if (res.Item1 != res.Item2)
                     {
-                        gm.MakeTurn(res.Item1, res.Item2);
+                        gm.MakeTurn(new Turn(res.Item1, res.Item2));
                     }
                 }
                 catch (Exception ex)
