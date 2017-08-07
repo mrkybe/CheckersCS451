@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -100,13 +101,17 @@ namespace CheckersCS451
             CheckersGM board;
 
             NetworkStream serverStream = new NetworkStream(clientSocket);
+            List<byte[]> parts = new List<byte[]>();
+            byte[] messageLengthBytes = new byte[4];
+            uint messageLength = 0;
+            byte[] inStream;
 
-            byte[] inStream = new byte[81920];
+            serverStream.Read(messageLengthBytes, 0, messageLengthBytes.Length);
+            messageLength = BitConverter.ToUInt32(messageLengthBytes, 0);
+
+            inStream = new byte[messageLength];
             serverStream.Read(inStream, 0, inStream.Length);
-            if (serverStream.DataAvailable)
-            {
-                throw new Exception("oh no");
-            }
+
             board = CheckersGM.FromBytes(inStream);
 
             return board;

@@ -45,7 +45,13 @@ namespace CheckersServer
                     Console.WriteLine(obj.ToString());
 
                     sendBytes = gameBoard.ToBytes();
+
+                    uint messageLength = (uint)sendBytes.Length;
+                    byte[] messageLengthBytes = BitConverter.GetBytes(messageLength);
+
+                    networkStream.Write(messageLengthBytes, 0, messageLengthBytes.Length);
                     networkStream.Write(sendBytes, 0, sendBytes.Length);
+
                     networkStream.Flush();
                 }
                 catch (IOException ex)
