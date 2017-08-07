@@ -78,7 +78,7 @@ namespace CheckersCS451
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(4, 1, 0, 1);
-            this.menuStrip1.Size = new System.Drawing.Size(452, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(452, 25);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -91,23 +91,23 @@ namespace CheckersCS451
             // box_serverIP
             // 
             this.box_serverIP.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.box_serverIP.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.box_serverIP.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.box_serverIP.Name = "box_serverIP";
             this.box_serverIP.Overflow = System.Windows.Forms.ToolStripItemOverflow.Never;
-            this.box_serverIP.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.box_serverIP.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.box_serverIP.ShortcutsEnabled = false;
-            this.box_serverIP.Size = new System.Drawing.Size(158, 22);
+            this.box_serverIP.Size = new System.Drawing.Size(158, 23);
             this.box_serverIP.Text = "Server IP";
             // 
             // box_serverPT
             // 
             this.box_serverPT.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.box_serverPT.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.box_serverPT.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.box_serverPT.Name = "box_serverPT";
             this.box_serverPT.Overflow = System.Windows.Forms.ToolStripItemOverflow.Never;
-            this.box_serverPT.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.box_serverPT.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.box_serverPT.ShortcutsEnabled = false;
-            this.box_serverPT.Size = new System.Drawing.Size(158, 22);
+            this.box_serverPT.Size = new System.Drawing.Size(158, 23);
             this.box_serverPT.Text = "Server Port";
             // 
             // panel_game
@@ -115,10 +115,10 @@ namespace CheckersCS451
             this.panel_game.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.panel_game.Controls.Add(this.table_rhs_split);
             this.panel_game.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel_game.Location = new System.Drawing.Point(0, 24);
-            this.panel_game.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.panel_game.Location = new System.Drawing.Point(0, 25);
+            this.panel_game.Margin = new System.Windows.Forms.Padding(2);
             this.panel_game.Name = "panel_game";
-            this.panel_game.Size = new System.Drawing.Size(452, 446);
+            this.panel_game.Size = new System.Drawing.Size(452, 445);
             this.panel_game.TabIndex = 2;
             // 
             // table_rhs_split
@@ -137,7 +137,7 @@ namespace CheckersCS451
             this.table_rhs_split.RowCount = 2;
             this.table_rhs_split.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 19F));
             this.table_rhs_split.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 254F));
-            this.table_rhs_split.Size = new System.Drawing.Size(448, 442);
+            this.table_rhs_split.Size = new System.Drawing.Size(448, 441);
             this.table_rhs_split.TabIndex = 1;
             // 
             // board
@@ -167,7 +167,7 @@ namespace CheckersCS451
             this.board.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
             this.board.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
             this.board.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
-            this.board.Size = new System.Drawing.Size(430, 423);
+            this.board.Size = new System.Drawing.Size(430, 422);
             this.board.TabIndex = 0;
             // 
             // table_top
@@ -343,7 +343,7 @@ namespace CheckersCS451
             this.table_numbers.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
             this.table_numbers.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
             this.table_numbers.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 13F));
-            this.table_numbers.Size = new System.Drawing.Size(18, 423);
+            this.table_numbers.Size = new System.Drawing.Size(18, 422);
             this.table_numbers.TabIndex = 2;
             // 
             // label_row1
@@ -351,7 +351,7 @@ namespace CheckersCS451
             this.label_row1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label_row1.AutoSize = true;
             this.label_row1.Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Bold);
-            this.label_row1.Location = new System.Drawing.Point(1, 385);
+            this.label_row1.Location = new System.Drawing.Point(1, 384);
             this.label_row1.Margin = new System.Windows.Forms.Padding(0);
             this.label_row1.Name = "label_row1";
             this.label_row1.Size = new System.Drawing.Size(16, 17);
@@ -470,7 +470,7 @@ namespace CheckersCS451
             this.Controls.Add(this.menuStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Form1";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "Main";

@@ -73,7 +73,7 @@ namespace Data
             var availableMoves = GetAvailableEmptyPositionsFor(from);
             var availableJumps = GetAvailableJumps(from);
 
-            if (availableMoves.Contains(nTo))
+            if (availableMoves.Contains(nTo) && availableJumps.Count == 0)
             {
                 // Actually move the piece
                 MovePiece(from, to);

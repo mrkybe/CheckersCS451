@@ -77,7 +77,6 @@ namespace CheckersCS451
                 clientSocket.Connect(ipAddress, 1337);
 
                 _myColor = GetPlayerColor();
-                MessageBox.Show(_myColor.ToString());
                 
                 keepBoardUpdatedThread = new Thread(KeepBoardUpdated);
                 keepBoardUpdatedThread.Start();
@@ -93,8 +92,15 @@ namespace CheckersCS451
         {
             while (clientSocket.Connected)
             {
-                _game = GetBoardState();
-                Update(_game);
+                try
+                {
+                    _game = GetBoardState();
+                    Update(_game);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
             }
         }
 

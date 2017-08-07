@@ -19,8 +19,16 @@ namespace CheckersServer
 
         public void Notify()
         {
-            NetworkStream networkStream = new NetworkStream(mySocket);
-            SendBoard(networkStream);
+            try
+            {
+                NetworkStream networkStream = new NetworkStream(mySocket);
+                SendBoard(networkStream);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(" >> " + ex.ToString());
+                Console.WriteLine(" Killing this thread - " + clientString);
+            }
         }
 
         internal ConnectedClient(Socket inClient, CheckersGM gameBoard, CheckersGM.Player playerColor, string clientString)
