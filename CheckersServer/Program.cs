@@ -44,20 +44,32 @@ namespace CheckersServer
                     Socket handler = listener.Accept();
                     Console.WriteLine("  Connection recieved, spinning up ConnectClient thread");
                     CheckersGM gameBoard;
+                    CheckersGM.Player playerColor = CheckersGM.Player.NULL;;
                     if (clientCount % 2 == 0)
                     {
                         gameBoard = new CheckersGM();
                         games.Add(gameBoard);
                         Console.WriteLine("  Even connected client count, creating new gameboard");
+                        playerColor = CheckersGM.Player.PLAYER_BLACK;
                     }
                     else
                     {
                         gameBoard = games.Last();
                         Console.WriteLine("  Odd connected client count, matching to last gameboard");
+                        playerColor = CheckersGM.Player.PLAYER_RED;
                     }
-                    clientCount++;
-                    ConnectedClient client = new ConnectedClient(handler, gameBoard,  clientCount.ToString());
+                    ConnectedClient client = new ConnectedClient(handler, gameBoard, playerColor, clientCount.ToString());
+
+                    if (clientCount % 2 == 1)
+                    {
+                        var otherPlayerClient = clients[clientCount - 1];
+                        client.otherPlayer = otherPlayerClient;
+                        otherPlayerClient.otherPlayer = client;
+                        Console.WriteLine("  Two players connected in same game, setting up ConnectedClient's otherPlayers");
+                    }
+
                     clients.Add(client);
+                    clientCount++;
                 }
             }
             catch (Exception e)

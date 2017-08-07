@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading;
 using System.Windows.Forms;
 using Data;
 
@@ -23,6 +24,7 @@ namespace CheckersCS451
         private EventHandler _finalizeLoadEvent;
 
         private CheckersGM _game;
+        private CheckersGM.Player _myColor = CheckersGM.Player.NULL;
         private Boolean _first;
 
         private Socket clientSocket;
@@ -74,15 +76,46 @@ namespace CheckersCS451
                 IPAddress ipAddress = ipHostInfo.AddressList[0];
                 clientSocket.Connect(ipAddress, 1337);
 
-                Turn test = new Turn(new Point(1,3), new Point(3,4), true );
-                SendTurn(test);
-
-                CheckersGM result = GetBoardState();
-                MessageBox.Show(result.DebugPrintSparseArray());
+                _myColor = GetPlayerColor();
+                MessageBox.Show(_myColor.ToString());
+                
+                keepBoardUpdatedThread = new Thread(KeepBoardUpdated);
+                keepBoardUpdatedThread.Start();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
+            }
+        }
+
+        private Thread keepBoardUpdatedThread;
+        private void KeepBoardUpdated()
+        {
+            while (clientSocket.Connected)
+            {
+                _game = GetBoardState();
+                Update(_game);
+            }
+        }
+
+        private CheckersGM.Player GetPlayerColor()
+        {
+            NetworkStream serverStream = new NetworkStream(clientSocket);
+            byte[] inStream = new byte[1];
+
+            serverStream.Read(inStream, 0, 1);
+
+            if (inStream[0] == 1)
+            {
+                return CheckersGM.Player.PLAYER_BLACK;
+            }
+            else if (inStream[0] == 2)
+            {
+                return CheckersGM.Player.PLAYER_RED;
+            }
+            else
+            {
+                return CheckersGM.Player.NULL;
             }
         }
 
@@ -91,7 +124,10 @@ namespace CheckersCS451
             NetworkStream serverStream = new NetworkStream(clientSocket);
 
             byte[] outStream = turn.ToBytes();
+            uint messageLength = (uint) outStream.Length;
+            byte[] messageLengthBytes = BitConverter.GetBytes(messageLength);
 
+            serverStream.Write(messageLengthBytes, 0, messageLengthBytes.Length);
             serverStream.Write(outStream, 0, outStream.Length);
             serverStream.Flush();
         }
@@ -101,7 +137,6 @@ namespace CheckersCS451
             CheckersGM board;
 
             NetworkStream serverStream = new NetworkStream(clientSocket);
-            List<byte[]> parts = new List<byte[]>();
             byte[] messageLengthBytes = new byte[4];
             uint messageLength = 0;
             byte[] inStream;
@@ -215,6 +250,17 @@ namespace CheckersCS451
                     cell.MouseClick += (s, e) => this.ProcessClick(s, e);
 				}
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            var f = box_serverPT.Text.Split(',');
+            int x1 = int.Parse(f[0]);
+            int y1 = int.Parse(f[1]);
+            int x2 = int.Parse(f[2]);
+            int y2 = int.Parse(f[3]);
+            Turn test = new Turn(new Point(x1,y1), new Point(x2,y2));
+            SendTurn(test);
         }
 
         private void ProcessClick(object sender, MouseEventArgs e)

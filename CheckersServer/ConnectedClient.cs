@@ -12,47 +12,100 @@ namespace CheckersServer
     {
         private Socket mySocket;
         private string clientString = "";
+        CheckersGM.Player playerColor = CheckersGM.Player.NULL;
         private CheckersGM gameBoard;
 
-        internal ConnectedClient(Socket inClient, CheckersGM gameBoard, string clientString)
+        public ConnectedClient otherPlayer = null;
+
+        public void Notify()
+        {
+            NetworkStream networkStream = new NetworkStream(mySocket);
+            SendBoard(networkStream);
+        }
+
+        internal ConnectedClient(Socket inClient, CheckersGM gameBoard, CheckersGM.Player playerColor, string clientString)
         {
             mySocket = inClient;
             this.gameBoard = gameBoard;
+            this.playerColor = playerColor;
             this.clientString = clientString;
+
             Thread connection = new Thread(DoConnection);
             connection.Start();
+        }
+
+        private Turn ReadTurnFromStream(NetworkStream stream)
+        {
+            uint messageLength = 0;
+            byte[] messageLengthBytes = BitConverter.GetBytes(messageLength);
+            stream.Read(messageLengthBytes, 0, messageLengthBytes.Length);
+            messageLength = BitConverter.ToUInt32(messageLengthBytes, 0);
+
+            byte[] bytesFrom = new byte[messageLength];
+            stream.Read(bytesFrom, 0, bytesFrom.Length);
+            return Turn.FromBytes(bytesFrom);
+        }
+
+        private void SendBoard(NetworkStream stream)
+        {
+            byte[] sendBytes = null;
+            sendBytes = gameBoard.ToBytes();
+
+            uint messageLength = (uint)sendBytes.Length;
+            byte[] messageLengthBytes = BitConverter.GetBytes(messageLength);
+
+            stream.Write(messageLengthBytes, 0, messageLengthBytes.Length);
+            stream.Write(sendBytes, 0, sendBytes.Length);
+
+            stream.Flush();
+        }
+
+        private void SendPlayerColor(NetworkStream stream)
+        {
+            byte[] sendBytes;
+            if (playerColor == CheckersGM.Player.PLAYER_BLACK)
+            {
+                sendBytes = new byte[1] { 1 };
+            }
+            else if (playerColor == CheckersGM.Player.PLAYER_RED)
+            {
+                sendBytes = new byte[1] { 2 };
+            }
+            else
+            {
+                sendBytes = new byte[1] { 0 };
+            }
+            stream.Write(sendBytes, 0, sendBytes.Length);
+            stream.Flush();
         }
 
         private void DoConnection()
         {
             int requestCount = 0;
-            byte[] bytesFrom = new byte[10000];
-            string dataFromClient = null;
-            Byte[] sendBytes = null;
-            string serverResponse = "SUP";
-            string rCount = null;
-            requestCount = 0;
-
             while (true)
             {
                 try
                 {
-                    requestCount = requestCount + 1;
                     NetworkStream networkStream = new NetworkStream(mySocket);
-                    networkStream.Read(bytesFrom, 0, bytesFrom.Length);
+                    if (requestCount == 0)
+                    {
+                        SendPlayerColor(networkStream);
+                        SendBoard(networkStream);
+                        requestCount++;
+                    }
+                    else
+                    {
+                        Turn obj = ReadTurnFromStream(networkStream);
+                        Console.WriteLine(obj.ToString());
+                        lock (gameBoard)
+                        {
+                            gameBoard.MakeTurn(obj);
+                        }
+                        otherPlayer?.Notify();
 
-                    Turn obj = Turn.FromBytes(bytesFrom);
-                    Console.WriteLine(obj.ToString());
-
-                    sendBytes = gameBoard.ToBytes();
-
-                    uint messageLength = (uint)sendBytes.Length;
-                    byte[] messageLengthBytes = BitConverter.GetBytes(messageLength);
-
-                    networkStream.Write(messageLengthBytes, 0, messageLengthBytes.Length);
-                    networkStream.Write(sendBytes, 0, sendBytes.Length);
-
-                    networkStream.Flush();
+                        SendBoard(networkStream);
+                        requestCount++;
+                    }
                 }
                 catch (IOException ex)
                 {
