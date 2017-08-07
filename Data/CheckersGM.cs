@@ -35,7 +35,7 @@ namespace Data
         public int Turn => turnNumber;
         public Node[,] SparseArray => sparseArray;
 
-        private Player currentPlayerTurn = Player.PLAYER_RED;
+        private Player currentPlayerTurn = Player.PLAYER_BLACK;
 
         public Player PieceToPlayer(State piece)
         {
@@ -188,8 +188,8 @@ namespace Data
         public CheckersGM()
         {
             InitializeBoard();
-            //PlacePieces();
-            PlaceTestPiecesBasic();
+            PlacePieces();
+            //PlaceTestPiecesBasic();
             /*
             Console.WriteLine(DebugPrintArray());
             Console.WriteLine(DebugPrintSparseArray());
@@ -654,6 +654,16 @@ namespace Data
                 f.Serialize(ms, this);
                 return ms.ToArray();
             }
+        }
+
+        public Player GetCurrentPlayer()
+        {
+            return currentPlayerTurn;
+        }
+
+        public GameState GetCurrentGameState()
+        {
+            return gameState;
         }
     }
 }

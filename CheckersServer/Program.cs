@@ -58,7 +58,8 @@ namespace CheckersServer
                         Console.WriteLine("  Odd connected client count, matching to last gameboard");
                         playerColor = CheckersGM.Player.PLAYER_RED;
                     }
-                    ConnectedClient client = new ConnectedClient(handler, gameBoard, playerColor, clientCount.ToString());
+                    string clientString = clientCount.ToString() + " " + playerColor;
+                    ConnectedClient client = new ConnectedClient(handler, gameBoard, playerColor, clientString);
 
                     if (clientCount % 2 == 1)
                     {

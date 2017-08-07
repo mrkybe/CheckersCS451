@@ -285,9 +285,20 @@ namespace CheckersCS451
 			// Control cell = this.board.GetControlFromPosition(col, row);
         }
 
+        public void UpdateText()
+        {
+            string player = _game.GetCurrentPlayer().ToString();
+            string color = _myColor.ToString();
+            string gameState = _game.GetCurrentGameState().ToString();
+            string turnNumber = _game.Turn.ToString();
+
+            this.Text = "Playing as: " + color + " | " + "Waiting on: " + player + " | " + "Turn #: " + turnNumber + " | " + "Game state: " + gameState;
+        }
+
         public void Update(CheckersGM newState)
         {
             this._game = newState;
+            UpdateText();
             Node[,] sparseArray = this._game.SparseArray;
 
             if (sparseArray == null || sparseArray.Length != 4)

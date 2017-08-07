@@ -99,11 +99,18 @@ namespace CheckersServer
                         Console.WriteLine(obj.ToString());
                         lock (gameBoard)
                         {
-                            gameBoard.MakeTurn(obj);
+                            if (playerColor == gameBoard.GetCurrentPlayer())
+                            {
+                                gameBoard.MakeTurn(obj);
+                            }
+                            else
+                            {
+                                Console.WriteLine("  " + clientString + " tried to move opponents piece");
+                            }
                         }
                         otherPlayer?.Notify();
-
                         SendBoard(networkStream);
+
                         requestCount++;
                     }
                 }
