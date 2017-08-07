@@ -72,7 +72,7 @@ namespace CheckersCS451
             {
                 clientSocket = new Socket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
 
-                IPHostEntry ipHostInfo = Dns.GetHostEntry("");
+                IPHostEntry ipHostInfo = Dns.GetHostEntry(box_serverIP.Text);
                 IPAddress ipAddress = ipHostInfo.AddressList[0];
                 clientSocket.Connect(ipAddress, 1337);
 
@@ -140,22 +140,18 @@ namespace CheckersCS451
 
         private CheckersGM GetBoardState()
         {
-            CheckersGM board;
-
             NetworkStream serverStream = new NetworkStream(clientSocket);
             byte[] messageLengthBytes = new byte[4];
-            uint messageLength = 0;
-            byte[] inStream;
 
             serverStream.Read(messageLengthBytes, 0, messageLengthBytes.Length);
-            messageLength = BitConverter.ToUInt32(messageLengthBytes, 0);
+            var messageLength = BitConverter.ToUInt32(messageLengthBytes, 0);
 
-            inStream = new byte[messageLength];
+            var inStream = new byte[messageLength];
             serverStream.Read(inStream, 0, inStream.Length);
 
-            board = CheckersGM.FromBytes(inStream);
+            var gmBoardState = CheckersGM.FromBytes(inStream);
 
-            return board;
+            return gmBoardState;
         }
 
         private void InitHook()
@@ -261,10 +257,10 @@ namespace CheckersCS451
         private void button1_Click(object sender, EventArgs e)
         {
             var f = box_serverPT.Text.Split(',');
-            int x1 = int.Parse(f[0]);
-            int y1 = int.Parse(f[1]);
-            int x2 = int.Parse(f[2]);
-            int y2 = int.Parse(f[3]);
+            int x1 = int.Parse(f[0]) - 1;
+            int y1 = int.Parse(f[1]) - 1;
+            int x2 = int.Parse(f[2]) - 1;
+            int y2 = int.Parse(f[3]) - 1;
             Turn test = new Turn(new Point(x1,y1), new Point(x2,y2));
             SendTurn(test);
         }
