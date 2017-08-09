@@ -277,7 +277,7 @@ namespace CheckersCS451
             String id = (sender as Control).Name;
 
 			row = Int32.Parse(id.Substring(7, id.LastIndexOf('c') - 7));
-			col = Int32.Parse(id.Substring(id.LastIndexOf('c')));
+			col = Int32.Parse(id.Substring(id.LastIndexOf('c') + 1));
 
             if (row < 0 || row > 7 || col < 0 || col > 7)
             {
@@ -286,6 +286,12 @@ namespace CheckersCS451
             }
 
             Point click = new Point(row, col);
+
+            // Flip black to top
+            if (!_flip)
+            {
+                click = new Point(click.X, 7 - click.Y);
+            }
 
             if (this._highlighted.Count != 0)
             {
@@ -297,7 +303,7 @@ namespace CheckersCS451
                     return;
                 }
 
-                SendTurn(new Turn(this._from, click));
+                SendTurn(new Turn(this._game.ToSparseXY(_from), this._game.ToSparseXY(click)));
                 this._from = Point.Empty;
                 return;
             }
@@ -326,15 +332,15 @@ namespace CheckersCS451
                     }
                 }
 
-                List<Node> moves = _game.GetAvailableEmptyPositionsFor(click);
-                List<Node> jumps = _game.GetAvailableJumps(click);
+                List<Node> moves = _game.GetAvailableEmptyPositionsFor(sparseClick);
+                List<Node> jumps = _game.GetAvailableJumps(sparseClick);
 
                 if (moves.Count <= 0 && jumps.Count <= 0)
                 {
                     return;
                 }
 
-                this._from = click;
+                this._from = sparseClick;
 	            foreach (Node opt in jumps.Count == 0 ? moves : jumps)
 	            {
 	                Point loc = opt.GetNormalPosition();
@@ -364,7 +370,9 @@ namespace CheckersCS451
             string gameState = _game.GetCurrentGameState().ToString();
             string turnNumber = _game.Turn.ToString();
 
-            this.Text = "Playing as: " + color + " | " + "Waiting on: " + player + " | " + "Turn #: " + turnNumber + " | " + "Game state: " + gameState;
+            this.Invoke((MethodInvoker)(() => { Text = "Playing as: " + color + " | " + "Waiting on: " + player + " | " + "Turn #: " + turnNumber + " | " + "Game state: " + gameState; }));
+
+            // this.Text = "Playing as: " + color + " | " + "Waiting on: " + player + " | " + "Turn #: " + turnNumber + " | " + "Game state: " + gameState;
         }
 
         public void Update(CheckersGM newState)
@@ -373,13 +381,13 @@ namespace CheckersCS451
             UpdateText();
             Node[,] sparseArray = this._game.SparseArray;
 
-            if (sparseArray == null || sparseArray.Length != 4)
+            if (sparseArray == null)
             {
 
                 // TODO: Handle this in a better manner
 
                 String _err = "Malformed sparse array sent to Form1.update";
-                Debug.WriteLine("Error: " + _err);
+                MessageBox.Show(String.Format("Error: {0}", _err));
                 // throw new ArgumentException(_err);
             }
 
@@ -402,26 +410,30 @@ namespace CheckersCS451
                     }
 
                     State cellState = (sparseArray[sparseCol, row]).GetState();
+                    
+                    Image background = null;
 
-                    Boolean flip = false;
                     switch (cellState)
 					{
 						case State.RED:
-                            cell.BackgroundImage = !flip ? image_pieceRed : image_pieceBlack;
+                            background = _flip ? image_pieceRed : image_pieceBlack;
 							break;
 						case State.KING_RED:
-                            cell.BackgroundImage = !flip ? image_kingRed : image_kingBlack;
+                            background = _flip ? image_kingRed : image_kingBlack;
 							break;
 						case State.BLACK:
-							cell.BackgroundImage = flip ? image_pieceRed : image_pieceBlack;
+                            background = !_flip ? image_pieceRed : image_pieceBlack;
 							break;
 						case State.KING_BLACK:
-							cell.BackgroundImage = flip ? image_kingRed : image_kingBlack;
+                            background = !_flip ? image_kingRed : image_kingBlack;
 							break;
                         default: // Implied: State.EMPTY
-                            cell.BackgroundImage = null;
+                            background = null;
                             break;
                     }
+
+                    cell.BackgroundImage = background;
+                    //cell.Invoke((MethodInvoker)(() => { BackgroundImage = background; }));
 
                     sparseCol++;
                 }
