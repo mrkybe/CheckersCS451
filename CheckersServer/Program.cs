@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Net.Sockets;
-using System.Text;
 using Data;
 using System.Drawing;
 using System.Linq;
@@ -18,6 +16,14 @@ namespace CheckersServer
         {
             clients = new List<ConnectedClient>();
             games = new List<CheckersGM>();
+
+			IPAddress[] addr = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+			Console.WriteLine("Server ipv4: " + addr[addr.Length - 1]);
+
+			if (addr[0].AddressFamily == AddressFamily.InterNetworkV6)
+			{
+				Console.WriteLine("Server ipv6: " + addr[0]);
+			}
 
             SetupSockets();
         }
@@ -44,7 +50,7 @@ namespace CheckersServer
                     Socket handler = listener.Accept();
                     Console.WriteLine("  Connection recieved, spinning up ConnectClient thread");
                     CheckersGM gameBoard;
-                    CheckersGM.Player playerColor = CheckersGM.Player.NULL;;
+                    CheckersGM.Player playerColor = CheckersGM.Player.NULL;
                     if (clientCount % 2 == 0)
                     {
                         gameBoard = new CheckersGM();

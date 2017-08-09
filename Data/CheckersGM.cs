@@ -270,7 +270,7 @@ namespace Data
             return GetAvailableEmptyPositionsForJumpingFor(n.GetSparsePosition());
         }
 
-        private List<Node> GetAvailableEmptyPositionsFor(Point pos)
+        public List<Node> GetAvailableEmptyPositionsFor(Point pos)
         {
             Node n = sparseArray[pos.X, pos.Y];
             State piece = n.GetState();
@@ -327,7 +327,7 @@ namespace Data
             return sparseArray[pos.X, pos.Y].GetState() == EMPTY;
         }
         
-        private List<Node> GetAvailableJumps(Point pos)
+        public List<Node> GetAvailableJumps(Point pos)
         {
             Node n = sparseArray[pos.X, pos.Y];
             State piece = n.GetState();

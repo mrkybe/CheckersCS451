@@ -25,9 +25,10 @@ namespace CheckersCS451
 
         private CheckersGM _game;
         private CheckersGM.Player _myColor = CheckersGM.Player.NULL;
-        private Boolean _first;
 
         private Socket clientSocket;
+        private Boolean _flip = false;
+        private List<Point> _highlighted;
 
         public Form1()
         {
@@ -46,24 +47,14 @@ namespace CheckersCS451
             // face with a snap-back for the window size
             this.Resize += (s, e) => this.Size = new Size(702, 746);
 
-            //this.text_gameInfo.Text = (
-                //String.Concat((this.Width + " x " + this.Height),
-                              //"  |  ",
-                              //(this.board.Width + " x " + this.board.Height),
-                              //"  |  ",
-                              //("CELL SZ: (" +
-                               // (this.board.Width / this.board.ColumnCount) +
-                               // " x " +
-                               // (this.board.Height / this.board.RowCount) +
-                               //")")));
-
-            this.connectToolStripMenuItem.Click += (s, e) => Connect(s, e);
             #endregion
 
             this.ResumeLayout();
 
             this._finalizeLoadEvent = new EventHandler(this.FinalizeForm);
-            this.Shown += this._finalizeLoadEvent;
+
+			this.Shown += this._finalizeLoadEvent;
+			this.connectToolStripMenuItem.Click += Connect;
         }
 
         private void Connect(object s, EventArgs e)
@@ -77,6 +68,7 @@ namespace CheckersCS451
                 clientSocket.Connect(ipAddress, 1337);
 
                 _myColor = GetPlayerColor();
+                _flip = _myColor == CheckersGM.Player.PLAYER_RED;
                 
                 keepBoardUpdatedThread = new Thread(KeepBoardUpdated);
                 keepBoardUpdatedThread.Start();
@@ -88,9 +80,11 @@ namespace CheckersCS451
         }
 
         private Thread keepBoardUpdatedThread;
+        private Point _from;
+
         private void KeepBoardUpdated()
         {
-            while (clientSocket.Connected)
+            while (clientSocket != null && clientSocket.Connected)
             {
                 try
                 {
@@ -158,6 +152,9 @@ namespace CheckersCS451
         {
             try
             {
+                this._from = Point.Empty;
+                this._highlighted = new List<Point>();
+
                 Assembly exAss = Assembly.GetExecutingAssembly();
 
                 Stream bgImg = exAss.GetManifestResourceStream("CheckersCS451.Resources.board_v2.png");
@@ -165,16 +162,16 @@ namespace CheckersCS451
                 Stream pcRed = exAss.GetManifestResourceStream("CheckersCS451.Resources.piece_red.png");
                 Stream pcBlk = exAss.GetManifestResourceStream("CheckersCS451.Resources.piece_black2.png");
 
-				Stream kgRed = exAss.GetManifestResourceStream("CheckersCS451.Resources.king_red.png");
-				Stream kgBlk = exAss.GetManifestResourceStream("CheckersCS451.Resources.king_black.png");
+				//Stream kgRed = exAss.GetManifestResourceStream("CheckersCS451.Resources.king_red.png");
+				//Stream kgBlk = exAss.GetManifestResourceStream("CheckersCS451.Resources.king_black.png");
 
                 this.board.BackgroundImage = new Bitmap(bgImg);
 
                 this.image_pieceRed = new Bitmap(pcRed);
                 this.image_pieceBlack = new Bitmap(pcBlk);
 
-				this.image_kingRed = new Bitmap(kgRed);
-			    this.image_kingBlack = new Bitmap(kgBlk);
+				//this.image_kingRed = new Bitmap(kgRed);
+                //this.image_kingBlack = new Bitmap(kgBlk);
 			}
             catch (Exception e)
             {
@@ -199,14 +196,19 @@ namespace CheckersCS451
                         Name = String.Format("label_r{0}c{1}", row, col),
                         Text = "", 
                         Anchor = AnchorStyles.None, 
-                        TextAlign = ContentAlignment.MiddleCenter
+                        TextAlign = ContentAlignment.MiddleCenter,
+					    BackColor = Color.Transparent,
+					    Dock = DockStyle.Fill,
+                        BackgroundImageLayout = ImageLayout.Center,
+                        BackgroundImage = null
                     }, col, row);
+
+                    this.board.GetControlFromPosition(col, row).MouseClick += ProcessClick;
                 }
             }
 
+            this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             this.board.ResumeLayout();
-
-            this.SetupPieces();
         }
 
         private void SetupPieces()
@@ -225,19 +227,18 @@ namespace CheckersCS451
                     cell.Dock = DockStyle.Fill;
 
                     Image img = null;
-                    Boolean flip = _game != null && (_game.Turn % 2 == 0) != this._first;
 
 					if ((row % 2 == 0) ^ (col % 2 == 0))
 					{
                         if (row < 3) {
-                            if (!flip)
+                            if (!_flip)
                                 img = this.image_pieceBlack;
                             else
                                 img = this.image_pieceRed;
 						}
 						else if (row > 4)
 						{
-							if (!flip)
+							if (!_flip)
 							    img = this.image_pieceRed;
 							else
 								img = this.image_pieceBlack;
@@ -267,24 +268,93 @@ namespace CheckersCS451
 
         private void ProcessClick(object sender, MouseEventArgs e)
         {
-            if (this._game == null)
+            if (this._game == null || (this._game.Turn % 2 == 0) == this._flip)
             {
                 return;
             }
 
-            // If turn % 2 == 0, we're playing as the first player.
-            // If we're not the first player, we don't play.
-            // I.e. turn % 2 == this._first ^ 1
-			if ((this._game.Turn % 2 == 0) != this._first)
+            int row = 0, col = 0;
+            String id = (sender as Control).Name;
+
+			row = Int32.Parse(id.Substring(7, id.LastIndexOf('c') - 7));
+			col = Int32.Parse(id.Substring(id.LastIndexOf('c')));
+
+            if (row < 0 || row > 7 || col < 0 || col > 7)
             {
+                Console.WriteLine("Malformed cell ID\n");
                 return;
             }
 
-            Point click = e.Location;
-            click.Offset(new Point(-this.board.Location.X, -this.board.Location.Y));
+            Point click = new Point(row, col);
 
-            // this.board.GetControlFromPosition((click.X - click.X % this.board.Width / this.board.ColumnCount) / (this.board.Width * this.board.ColumnCount));
-			// Control cell = this.board.GetControlFromPosition(col, row);
+            if (this._highlighted.Count != 0)
+            {
+                this.RemoveHighlights();
+
+                if (!this._highlighted.Contains(click))
+                {
+                    ProcessClick(sender, e);
+                    return;
+                }
+
+                SendTurn(new Turn(this._from, click));
+                this._from = Point.Empty;
+                return;
+            }
+            else
+            {
+                Point sparseClick = _game.ToSparseXY(click);
+                State stateClick = _game.SparseArray[sparseClick.X, sparseClick.Y].GetState();
+
+                if (stateClick == State.EMPTY)
+                {
+                    return;
+                }
+
+                if (this._myColor == CheckersGM.Player.PLAYER_RED)
+                {
+                    if (stateClick == State.BLACK || stateClick == State.KING_BLACK)
+                    {
+                        return;
+                    }
+                }
+                else if (this._myColor == CheckersGM.Player.PLAYER_BLACK)
+                {
+                    if (stateClick == State.RED || stateClick == State.KING_RED)
+                    {
+                        return;
+                    }
+                }
+
+                List<Node> moves = _game.GetAvailableEmptyPositionsFor(click);
+                List<Node> jumps = _game.GetAvailableJumps(click);
+
+                if (moves.Count <= 0 && jumps.Count <= 0)
+                {
+                    return;
+                }
+
+                this._from = click;
+	            foreach (Node opt in jumps.Count == 0 ? moves : jumps)
+	            {
+	                Point loc = opt.GetNormalPosition();
+                    Control cell = this.board.GetControlFromPosition(loc.X, loc.Y);
+
+                    cell.BackColor = Color.Cyan;
+                    this._highlighted.Add(loc);
+	            }
+
+            }
+        }
+
+        private void RemoveHighlights()
+        {
+            foreach (Point loc in this._highlighted)
+			{
+				this.board.GetControlFromPosition(loc.X, loc.Y).BackColor = Color.Transparent;
+            }
+
+            this._highlighted.Clear();
         }
 
         public void UpdateText()
@@ -333,19 +403,20 @@ namespace CheckersCS451
 
                     State cellState = (sparseArray[sparseCol, row]).GetState();
 
+                    Boolean flip = false;
                     switch (cellState)
 					{
 						case State.RED:
-                            cell.BackgroundImage = image_pieceRed;
+                            cell.BackgroundImage = !flip ? image_pieceRed : image_pieceBlack;
 							break;
 						case State.KING_RED:
-							cell.BackgroundImage = image_kingRed;
+                            cell.BackgroundImage = !flip ? image_kingRed : image_kingBlack;
 							break;
 						case State.BLACK:
-							cell.BackgroundImage = image_pieceBlack;
+							cell.BackgroundImage = flip ? image_pieceRed : image_pieceBlack;
 							break;
 						case State.KING_BLACK:
-							cell.BackgroundImage = image_kingBlack;
+							cell.BackgroundImage = flip ? image_kingRed : image_kingBlack;
 							break;
                         default: // Implied: State.EMPTY
                             cell.BackgroundImage = null;
