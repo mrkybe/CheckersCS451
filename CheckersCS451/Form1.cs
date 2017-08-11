@@ -285,30 +285,38 @@ namespace CheckersCS451
                 return;
             }
 
-            Point click = new Point(row, col);
+            Point click = new Point(col, row);
 
             // Flip black to top
-            if (!_flip)
-            {
-                click = new Point(click.X, 7 - click.Y);
-            }
 
             if (this._highlighted.Count != 0)
             {
-                this.RemoveHighlights();
 
                 if (!this._highlighted.Contains(click))
                 {
+                    this.RemoveHighlights();
                     ProcessClick(sender, e);
                     return;
                 }
 
-                SendTurn(new Turn(this._game.ToSparseXY(_from), this._game.ToSparseXY(click)));
+                this.RemoveHighlights();
+
+                if (!_flip)
+                {
+                    click = new Point(7 - click.X, 7 - click.Y);
+                }
+
+                SendTurn(new Turn(_from, this._game.ToSparseXY(click)));
                 this._from = Point.Empty;
                 return;
             }
             else
             {
+                if (!_flip)
+                {
+                    click = new Point(7 - click.X, 7 - click.Y);
+                }
+
                 Point sparseClick = _game.ToSparseXY(click);
                 State stateClick = _game.SparseArray[sparseClick.X, sparseClick.Y].GetState();
 
@@ -344,6 +352,11 @@ namespace CheckersCS451
 	            foreach (Node opt in jumps.Count == 0 ? moves : jumps)
 	            {
 	                Point loc = opt.GetNormalPosition();
+                    if (!_flip)
+                    {
+                        loc = new Point(7 - loc.X, 7 - loc.Y);
+                    }
+
                     Control cell = this.board.GetControlFromPosition(loc.X, loc.Y);
 
                     cell.BackColor = Color.Cyan;
