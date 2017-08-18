@@ -68,7 +68,7 @@ namespace CheckersCS451
                 clientSocket.Connect(ipAddress, 1337);
 
                 _myColor = GetPlayerColor();
-                _flip = _myColor == CheckersGM.Player.PLAYER_RED;
+                _flip = _myColor == CheckersGM.Player.PLAYER_BLACK;
                 
                 keepBoardUpdatedThread = new Thread(KeepBoardUpdated);
                 keepBoardUpdatedThread.Start();
@@ -231,14 +231,14 @@ namespace CheckersCS451
 					if ((row % 2 == 0) ^ (col % 2 == 0))
 					{
                         if (row < 3) {
-                            if (!_flip)
+                            if (_flip)
                                 img = this.image_pieceBlack;
                             else
                                 img = this.image_pieceRed;
 						}
 						else if (row > 4)
 						{
-							if (!_flip)
+							if (_flip)
 							    img = this.image_pieceRed;
 							else
 								img = this.image_pieceBlack;
@@ -268,7 +268,7 @@ namespace CheckersCS451
 
         private void ProcessClick(object sender, MouseEventArgs e)
         {
-            if (this._game == null || (this._game.Turn % 2 == 0) == this._flip)
+            if (this._game == null || (this._game.Turn % 2 == 0) != this._flip)
             {
                 return;
             }
@@ -301,7 +301,7 @@ namespace CheckersCS451
 
                 this.RemoveHighlights();
 
-                if (!_flip)
+                if (_flip)
                 {
                     click = new Point(7 - click.X, 7 - click.Y);
                 }
@@ -312,7 +312,7 @@ namespace CheckersCS451
             }
             else
             {
-                if (!_flip)
+                if (_flip)
                 {
                     click = new Point(7 - click.X, 7 - click.Y);
                 }
@@ -349,19 +349,40 @@ namespace CheckersCS451
                 }
 
                 this._from = sparseClick;
-	            foreach (Node opt in jumps.Count == 0 ? moves : jumps)
-	            {
-	                Point loc = opt.GetNormalPosition();
-                    if (!_flip)
+                if (jumps.Count == 0)
+                {
+                    foreach (Node opt in moves)
                     {
-                        loc = new Point(7 - loc.X, 7 - loc.Y);
+                        Point loc = opt.GetNormalPosition();
+                        if (_flip)
+                        {
+                            loc = new Point(7 - loc.X, 7 - loc.Y);
+                        }
+
+                        Control cell = this.board.GetControlFromPosition(loc.X, loc.Y);
+
+                        cell.BackColor = Color.Cyan;
+                        this._highlighted.Add(loc);
                     }
+                }
+                else
+                {
+                    foreach (Node opt in jumps)
+                    {
+                        Point loc = opt.GetNormalPosition();
+                        if (_flip)
+                        {
+                            loc = new Point(7 - loc.X, 7 - loc.Y);
+                        }
 
-                    Control cell = this.board.GetControlFromPosition(loc.X, loc.Y);
+                        loc.Offset((loc.X < click.X ? -1 : 1), (loc.Y < click.Y ? -1 : 1));
 
-                    cell.BackColor = Color.Cyan;
-                    this._highlighted.Add(loc);
-	            }
+                        Control cell = this.board.GetControlFromPosition(loc.X, loc.Y);
+
+                        cell.BackColor = Color.Cyan;
+                        this._highlighted.Add(loc);
+                    }
+                }
 
             }
         }
@@ -404,6 +425,27 @@ namespace CheckersCS451
                 // throw new ArgumentException(_err);
             }
 
+            if (_flip)
+            {
+                //Debug.WriteLine(DebugPrintSparseArrayLOCAL(sparseArray));
+
+                int rs = sparseArray.GetLength(0) - 1, cs = sparseArray.GetLength(1) - 1;
+                Node[,] temp = new Node[rs + 1, cs + 1];
+
+                for (Int32 row = 0; row <= rs; row++)
+                {
+                    for (Int32 col = 0; col <= cs; col++)
+                    {
+                        temp[row, col] = sparseArray[rs - row, cs - col];
+                    }
+                }
+
+                sparseArray = temp;
+                
+                //Debug.Write("\n--------------------------\n\n");
+                //Debug.WriteLine(DebugPrintSparseArrayLOCAL(sparseArray));
+            }
+
             for (int row = 0; row < this.board.RowCount; row++) {
                 
                 int sparseCol = 0;
@@ -413,7 +455,7 @@ namespace CheckersCS451
 					{
 						continue;
 					}
-
+                    
                     Control cell = this.board.GetControlFromPosition(col, row);
 
                     if (cell == null)
@@ -429,16 +471,16 @@ namespace CheckersCS451
                     switch (cellState)
 					{
 						case State.RED:
-                            background = _flip ? image_pieceRed : image_pieceBlack;
+                            background = image_pieceRed;
 							break;
 						case State.KING_RED:
-                            background = _flip ? image_kingRed : image_kingBlack;
+                            background = image_kingRed;
 							break;
 						case State.BLACK:
-                            background = !_flip ? image_pieceRed : image_pieceBlack;
+                            background = image_pieceBlack;
 							break;
 						case State.KING_BLACK:
-                            background = !_flip ? image_kingRed : image_kingBlack;
+                            background = image_kingBlack;
 							break;
                         default: // Implied: State.EMPTY
                             background = null;
@@ -451,6 +493,106 @@ namespace CheckersCS451
                     sparseCol++;
                 }
             }
+        }
+
+
+
+        public string DebugPrintSparseArrayLOCAL(Node[,] sparseArray)
+        {
+            var display = "";
+            var space = "   ";
+            var connectedSpaceR = " \\ ";
+            var connectedSpaceL = " / ";
+            var connectedSpaceX = " X ";
+            var linkedSpace = "---";
+            for (var y = -1; y < 8; y++)
+            {
+                var connectionMapVertical = " " + space;
+                for (var x = -1; x < 4; x++)
+                {
+                    var connectionMapHorizontal = space;
+                    if (x != -1 && y != -1)
+                    {
+                        var s = " ";
+                        s = sparseArray[x, y].GetStateString();
+                        if (x != 3)
+                        {
+                            var linked = sparseArray[x, y].IsLinkedTo(sparseArray[x + 1, y]);
+                            if (linked)
+                            {
+                                connectionMapHorizontal = linkedSpace;
+                            }
+                        }
+                        var RightLink = false;
+                        var LeftLink = false;
+                        var DownLink = false;
+                        if (y != 7 && x != 3)
+                        {
+                            RightLink = sparseArray[x, y].IsLinkedTo(sparseArray[x + 1, y + 1]);
+                        }
+                        if (y != 7)
+                        {
+                            DownLink = sparseArray[x, y].IsLinkedTo(sparseArray[x, y + 1]);
+                        }
+                        if (y != 7 && x != 0)
+                        {
+                            LeftLink = sparseArray[x, y].IsLinkedTo(sparseArray[x - 1, y + 1]);
+                        }
+                        if (LeftLink)
+                        {
+                            var previous = connectionMapVertical[connectionMapVertical.Length - 2];
+                            connectionMapVertical = connectionMapVertical.Substring(0, connectionMapVertical.Length - space.Length);
+                            if (previous == '\\')
+                            {
+                                connectionMapVertical += connectedSpaceX;
+                            }
+                            else
+                            {
+                                connectionMapVertical += connectedSpaceL;
+                            }
+                        }
+                        if (DownLink)
+                        {
+                            connectionMapVertical += "|";
+                        }
+                        else
+                        {
+                            connectionMapVertical += " ";
+                        }
+                        if (RightLink)
+                        {
+                            connectionMapVertical += connectedSpaceR;
+                        }
+                        else
+                        {
+                            connectionMapVertical += space;
+                        }
+                        display += s + connectionMapHorizontal;
+                    }
+                    else if (y != -1)
+                    {
+                        display += y + space;
+                    }
+                    else if (x == -1)
+                    {
+                        display += " " + space;
+                    }
+                    else if (x != -1)
+                    {
+                        display += x + space;
+                    }
+                }
+                if (y >= 0 && y < 7)
+                {
+                    display += "\n" + connectionMapVertical + "\n";
+                    //display += "\n" + space + " | \\" + " | \\" + " | \\" + " |" + "\n";
+                }
+                else
+                {
+                    display += "\n\n";
+                }
+            }
+            return display;
         }
     }
 }
