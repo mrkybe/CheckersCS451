@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -68,8 +68,30 @@ namespace CheckersCS451
 			{
 				clientSocket = new Socket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
 
-				IPHostEntry ipHostInfo = Dns.GetHostEntry(box_serverIP.Text);
-				IPAddress ipAddress = ipHostInfo.AddressList[0];
+                IPAddress ipAddress = null;
+
+                if (box_serverIP.Text.Trim().Equals(String.Empty))
+                {
+                    IPHostEntry ipHostInfo = Dns.GetHostEntry(box_serverIP.Text);
+                    ipAddress = ipHostInfo.AddressList[0];
+                } else
+                {
+                    try
+                    {
+                        ipAddress = IPAddress.Parse(box_serverIP.Text);
+                    } catch (Exception)
+                    {
+                        MessageBox.Show("Invalid IP Address entered!");
+                        return;
+                    }
+                }
+                
+                if (ipAddress == null)
+                {
+                    MessageBox.Show("Invalid IP Address!");
+                    return;
+                }
+
 				clientSocket.Connect(ipAddress, 1337);
 
 				_myColor = GetPlayerColor();
@@ -109,6 +131,7 @@ namespace CheckersCS451
 			byte[] inStream = new byte[1];
 
 			serverStream.Read(inStream, 0, 1);
+            Thread.Sleep(100);
 
 			if (inStream[0] == 1)
 			{
