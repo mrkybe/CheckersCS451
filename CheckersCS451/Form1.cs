@@ -66,14 +66,13 @@ namespace CheckersCS451
 
 			try
 			{
-				clientSocket = new Socket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
+				clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
                 IPAddress ipAddress = null;
 
                 if (box_serverIP.Text.Trim().Equals(String.Empty))
                 {
-                    IPHostEntry ipHostInfo = Dns.GetHostEntry(box_serverIP.Text);
-                    ipAddress = ipHostInfo.AddressList[0];
+                    ipAddress = Array.FindLast(Dns.GetHostEntry(string.Empty).AddressList, a => a.AddressFamily == AddressFamily.InterNetwork);
                 } else
                 {
                     try
