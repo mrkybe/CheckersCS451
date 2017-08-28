@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using Data;
@@ -97,8 +97,8 @@ namespace CheckersServer
 
 			try
 			{
-				IPAddress ipAd = Dns.GetHostEntry("").AddressList[0];
-				TcpListener tcp = new TcpListener(ipAd, 1337);
+                IPAddress ipAd = Array.FindLast(Dns.GetHostEntry(string.Empty).AddressList, a => a.AddressFamily == AddressFamily.InterNetwork);
+                TcpListener tcp = new TcpListener(ipAd, 1337);
 
 				tcp.Start();
 
