@@ -59,6 +59,11 @@ namespace CheckersCS451
 
 		private void Connect(object s, EventArgs e)
 		{
+
+            if (clientSocket != null && clientSocket.Connected) {
+                return;
+            }
+
 			try
 			{
 				clientSocket = new Socket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
@@ -162,16 +167,16 @@ namespace CheckersCS451
 				Stream pcRed = exAss.GetManifestResourceStream("CheckersCS451.Resources.piece_red.png");
 				Stream pcBlk = exAss.GetManifestResourceStream("CheckersCS451.Resources.piece_black2.png");
 
-				//Stream kgRed = exAss.GetManifestResourceStream("CheckersCS451.Resources.king_red.png");
-				//Stream kgBlk = exAss.GetManifestResourceStream("CheckersCS451.Resources.king_black.png");
+				Stream kgRed = exAss.GetManifestResourceStream("CheckersCS451.Resources.king_red.png");
+				Stream kgBlk = exAss.GetManifestResourceStream("CheckersCS451.Resources.king_black.png");
 
 				this.board.BackgroundImage = new Bitmap(bgImg);
 
 				this.image_pieceRed = new Bitmap(pcRed);
 				this.image_pieceBlack = new Bitmap(pcBlk);
 
-				//this.image_kingRed = new Bitmap(kgRed);
-				//this.image_kingBlack = new Bitmap(kgBlk);
+				this.image_kingRed = new Bitmap(kgRed);
+				this.image_kingBlack = new Bitmap(kgBlk);
 			}
 			catch (Exception e)
 			{
