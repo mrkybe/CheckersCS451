@@ -46,6 +46,14 @@ namespace Data
 			Point from = turn.From;
 			Point to = turn.To;
 			Node nFrom = sparseArray[from.X, from.Y];
+
+		    if (turn.Forfeit)
+		    {
+		        gameState = currentPlayerTurn == Player.PLAYER_BLACK ? GameState.RED_WIN : GameState.BLACK_WIN;
+                Console.WriteLine("PLAYER " + currentPlayerTurn + " FORFIETS!");
+		        return EndTurn();
+		    }
+
 			if (activePiece != null && nFrom != activePiece)
 			{
 				throw new Exception("Can't move this piece, must use locked piece instead");
