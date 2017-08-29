@@ -1,0 +1,6 @@
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersUtilities\bin\Debug\CheckersUtilities.dll
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersUtilities\bin\Debug\CheckersUtilities.pdb
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersUtilities\obj\Debug\CheckersUtilities.dll
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersUtilities\obj\Debug\CheckersUtilities.pdb
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersUtilities\bin\Debug\CheckersUtilities.dll.CodeAnalysisLog.xml
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersUtilities\bin\Debug\CheckersUtilities.dll.lastcodeanalysissucceeded

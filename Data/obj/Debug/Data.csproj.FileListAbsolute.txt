@@ -1,0 +1,9 @@
+C:\Users\cjm377\Downloads\CheckersCS451-master\Data\bin\Debug\Data.dll
+C:\Users\cjm377\Downloads\CheckersCS451-master\Data\bin\Debug\Data.pdb
+C:\Users\cjm377\Downloads\CheckersCS451-master\Data\bin\Debug\CheckersUtilities.dll
+C:\Users\cjm377\Downloads\CheckersCS451-master\Data\bin\Debug\CheckersUtilities.pdb
+C:\Users\cjm377\Downloads\CheckersCS451-master\Data\obj\Debug\Data.csprojResolveAssemblyReference.cache
+C:\Users\cjm377\Downloads\CheckersCS451-master\Data\obj\Debug\Data.dll
+C:\Users\cjm377\Downloads\CheckersCS451-master\Data\obj\Debug\Data.pdb
+C:\Users\cjm377\Downloads\CheckersCS451-master\Data\bin\Debug\Data.dll.CodeAnalysisLog.xml
+C:\Users\cjm377\Downloads\CheckersCS451-master\Data\bin\Debug\Data.dll.lastcodeanalysissucceeded
