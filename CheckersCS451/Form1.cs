@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -6,11 +6,10 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Windows.Forms;
 using Data;
+using CheckersUtilities;
 
 namespace CheckersCS451
 {
@@ -24,10 +23,10 @@ namespace CheckersCS451
 		private EventHandler _finalizeLoadEvent;
 
 		private CheckersGM _game;
-		private CheckersGM.Player _myColor = CheckersGM.Player.NULL;
+		private Player _myColor = Player.NULL;
 
 		private Socket clientSocket;
-		private Boolean _flip = false, _jumping = false;
+		private Boolean _flip, _jumping;
 		private List<Point> _highlighted;
 
 		public Form1()
@@ -43,8 +42,6 @@ namespace CheckersCS451
 			InitHook();
 
 			#region DEBUG_CODE
-			// TODO: Prevent resize instead of slapping users in the 
-			// face with a snap-back for the window size
 			this.Resize += (s, e) => this.Size = new Size(702, 746);
 
 			#endregion
@@ -66,35 +63,14 @@ namespace CheckersCS451
 
 			try
 			{
-				clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+				clientSocket = new Socket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
 
-                IPAddress ipAddress = null;
-
-                if (box_serverIP.Text.Trim().Equals(String.Empty))
-                {
-                    ipAddress = Array.FindLast(Dns.GetHostEntry(string.Empty).AddressList, a => a.AddressFamily == AddressFamily.InterNetwork);
-                } else
-                {
-                    try
-                    {
-                        ipAddress = IPAddress.Parse(box_serverIP.Text);
-                    } catch (Exception)
-                    {
-                        MessageBox.Show("Invalid IP Address entered!");
-                        return;
-                    }
-                }
-                
-                if (ipAddress == null)
-                {
-                    MessageBox.Show("Invalid IP Address!");
-                    return;
-                }
-
+				IPHostEntry ipHostInfo = Dns.GetHostEntry(box_serverIP.Text);
+				IPAddress ipAddress = ipHostInfo.AddressList[0];
 				clientSocket.Connect(ipAddress, 1337);
 
 				_myColor = GetPlayerColor();
-				_flip = _myColor == CheckersGM.Player.PLAYER_BLACK;
+				_flip = _myColor == Player.PLAYER_BLACK;
 
 				keepBoardUpdatedThread = new Thread(KeepBoardUpdated);
 				keepBoardUpdatedThread.Start();
@@ -124,25 +100,24 @@ namespace CheckersCS451
 			}
 		}
 
-		private CheckersGM.Player GetPlayerColor()
+		private Player GetPlayerColor()
 		{
 			NetworkStream serverStream = new NetworkStream(clientSocket);
 			byte[] inStream = new byte[1];
 
 			serverStream.Read(inStream, 0, 1);
-            Thread.Sleep(100);
 
 			if (inStream[0] == 1)
 			{
-				return CheckersGM.Player.PLAYER_BLACK;
+				return Player.PLAYER_BLACK;
 			}
 			else if (inStream[0] == 2)
 			{
-				return CheckersGM.Player.PLAYER_RED;
+				return Player.PLAYER_RED;
 			}
 			else
 			{
-				return CheckersGM.Player.NULL;
+				return Player.NULL;
 			}
 		}
 
@@ -203,8 +178,6 @@ namespace CheckersCS451
 			catch (Exception e)
 			{
 				Debug.WriteLine("Exception: " + e.Message);
-
-				/* TODO: Handle issues with loading board or piece images? */
 			}
 		}
 
@@ -287,16 +260,16 @@ namespace CheckersCS451
 			}
 		}
 
-		private void button1_Click(object sender, EventArgs e)
-		{
-			var f = box_serverPT.Text.Split(',');
-			int x1 = int.Parse(f[0]) - 1;
-			int y1 = int.Parse(f[1]) - 1;
-			int x2 = int.Parse(f[2]) - 1;
-			int y2 = int.Parse(f[3]) - 1;
-			Turn test = new Turn(new Point(x1, y1), new Point(x2, y2));
-			SendTurn(test);
-		}
+		//private void button1_Click(object sender, EventArgs e)
+		//{
+		//	var f = box_serverPT.Text.Split(',');
+		//	int x1 = int.Parse(f[0]) - 1;
+		//	int y1 = int.Parse(f[1]) - 1;
+		//	int x2 = int.Parse(f[2]) - 1;
+		//	int y2 = int.Parse(f[3]) - 1;
+		//	Turn test = new Turn(new Point(x1, y1), new Point(x2, y2));
+		//	SendTurn(test);
+		//}
 
 		private void ProcessClick(object sender, MouseEventArgs e)
 		{
@@ -369,14 +342,14 @@ namespace CheckersCS451
 					return;
 				}
 
-				if (this._myColor == CheckersGM.Player.PLAYER_RED)
+				if (this._myColor == Player.PLAYER_RED)
 				{
 					if (stateClick == State.BLACK || stateClick == State.KING_BLACK)
 					{
 						return;
 					}
 				}
-				else if (this._myColor == CheckersGM.Player.PLAYER_BLACK)
+				else if (this._myColor == Player.PLAYER_BLACK)
 				{
 					if (stateClick == State.RED || stateClick == State.KING_RED)
 					{

@@ -5,6 +5,7 @@ using Data;
 using System.Drawing;
 using System.Linq;
 using System.Net;
+using CheckersUtilities;
 
 namespace CheckersServer
 {
@@ -112,20 +113,20 @@ namespace CheckersServer
 					Console.WriteLine("Connection recieved from {0}, spinning up ConnectClient thread", s.RemoteEndPoint);
 
 					CheckersGM gameBoard;
-					CheckersGM.Player playerColor = CheckersGM.Player.NULL;
+					Player playerColor = Player.NULL;
 
 					if (clientCount % 2 == 0)
 					{
 						gameBoard = new CheckersGM();
 						games.Add(gameBoard);
 						Console.WriteLine("Even connected client count. Creating new gameboard");
-						playerColor = CheckersGM.Player.PLAYER_BLACK;
+						playerColor = Player.PLAYER_BLACK;
 					}
 					else
 					{
 						gameBoard = games.Last();
 						Console.WriteLine("Odd connected client count. Matching to last gameboard");
-						playerColor = CheckersGM.Player.PLAYER_RED;
+						playerColor = Player.PLAYER_RED;
 					}
 					string clientString = clientCount.ToString() + " " + playerColor;
 					ConnectedClient client = new ConnectedClient(s, gameBoard, playerColor, clientString);

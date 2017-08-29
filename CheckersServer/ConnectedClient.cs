@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Net.Sockets;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using System.Threading;
+using CheckersUtilities;
 using Data;
 
 namespace CheckersServer
@@ -12,7 +11,7 @@ namespace CheckersServer
 	{
 		private Socket mySocket;
 		private string clientString = "";
-		CheckersGM.Player playerColor = CheckersGM.Player.NULL;
+		Player playerColor = Player.NULL;
 		private readonly CheckersGM gameBoard;
 
 		public ConnectedClient otherPlayer;
@@ -32,7 +31,7 @@ namespace CheckersServer
 			}
 		}
 
-		internal ConnectedClient(Socket inClient, CheckersGM gameBoard, CheckersGM.Player playerColor, string clientString)
+		internal ConnectedClient(Socket inClient, CheckersGM gameBoard, Player playerColor, string clientString)
 		{
 			mySocket = inClient;
 			this.gameBoard = gameBoard;
@@ -43,7 +42,7 @@ namespace CheckersServer
 			connection.Start();
 		}
 
-		private Turn ReadTurnFromStream() //ReadTurnFromStream(NetworkStream stream)
+		private CheckersUtilities.Turn ReadTurnFromStream() //ReadTurnFromStream(NetworkStream stream)
 		{
 			uint messageLength = 0;
 			byte[] messageLengthBytes = BitConverter.GetBytes(messageLength);
@@ -54,7 +53,7 @@ namespace CheckersServer
 			byte[] bytesFrom = new byte[messageLength];
 			mySocket.Receive(bytesFrom, 0, bytesFrom.Length, SocketFlags.None);
 			//stream.Read(bytesFrom, 0, bytesFrom.Length);
-			return Turn.FromBytes(bytesFrom);
+			return CheckersUtilities.Turn.FromBytes(bytesFrom);
 		}
 
 		private void SendBoard() //SendBoard(NetworkStream stream)
@@ -77,11 +76,11 @@ namespace CheckersServer
 		private void SendPlayerColor() //SendPlayerColor(NetworkStream stream)
 		{
 			byte[] sendBytes;
-			if (playerColor == CheckersGM.Player.PLAYER_BLACK)
+			if (playerColor == Player.PLAYER_BLACK)
 			{
 				sendBytes = new byte[1] { 1 };
 			}
-			else if (playerColor == CheckersGM.Player.PLAYER_RED)
+			else if (playerColor == Player.PLAYER_RED)
 			{
 				sendBytes = new byte[1] { 2 };
 			}
@@ -115,7 +114,7 @@ namespace CheckersServer
 					else
 					{
 						//Turn obj = ReadTurnFromStream(networkStream);
-						Turn obj = ReadTurnFromStream();
+						CheckersUtilities.Turn obj = ReadTurnFromStream();
 						Console.WriteLine(obj.ToString());
 						lock (gameBoard)
 						{

@@ -1,16 +1,15 @@
 ﻿﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using static Data.State;
+using CheckersUtilities;
 
 namespace Data
 {
 	[Serializable]
-	public class CheckersGM : Game
+	public class CheckersGM
 	{
 		private readonly Node[,] array = new Node[8, 8];
 		private readonly Node[,] sparseArray = new Node[4, 8];
@@ -20,18 +19,6 @@ namespace Data
 		private int turnNumber = 0;
 		private GameState gameState = GameState.PLAY;
 
-		public enum Player
-		{
-			PLAYER_RED,
-			PLAYER_BLACK,
-			NULL
-		};
-
-		public enum GameState
-		{
-			PLAY, STALEMATE, RED_WIN, BLACK_WIN
-		}
-
 		public int Turn => turnNumber;
 		public Node[,] SparseArray => sparseArray;
 
@@ -39,11 +26,11 @@ namespace Data
 
 		public Player PieceToPlayer(State piece)
 		{
-			if (piece == BLACK || piece == KING_BLACK)
+			if (piece == State.BLACK || piece == State.KING_BLACK)
 			{
 				return Player.PLAYER_BLACK;
 			}
-			else if (piece == RED || piece == KING_RED)
+			else if (piece == State.RED || piece == State.KING_RED)
 			{
 				return Player.PLAYER_RED;
 			}
@@ -152,7 +139,7 @@ namespace Data
 			Node nFrom = sparseArray[from.X, from.Y];
 			Node nTo = sparseArray[to.X, to.Y];
 
-			if (nFrom.GetState() == EMPTY || nTo.GetState() != EMPTY)
+			if (nFrom.GetState() == State.EMPTY || nTo.GetState() != State.EMPTY)
 			{
 				throw new Exception("Bad move attempted!");
 			}
@@ -168,7 +155,7 @@ namespace Data
             }
 
 			nTo.SetState(endState);
-			nFrom.SetState(EMPTY);
+			nFrom.SetState(State.EMPTY);
 		}
 
 		private Player EndTurn()
@@ -177,7 +164,7 @@ namespace Data
 			activePiece = null;
 			foreach (Node n in jumpedPieces)
 			{
-				n.SetState(EMPTY);
+				n.SetState(State.EMPTY);
 			}
 			jumpedPieces.Clear();
 			turnNumber++;
@@ -241,15 +228,15 @@ namespace Data
 
 		private void PlaceTestPiecesBasic()
 		{
-			PlacePiece(BLACK, 3, 0);
-			PlacePiece(RED, 3, 2);
-			PlacePiece(RED, 2, 2);
+			PlacePiece(State.BLACK, 3, 0);
+			PlacePiece(State.RED, 3, 2);
+			PlacePiece(State.RED, 2, 2);
 		}
 
 		private void PlaceTestPiecesKing()
 		{
-			PlacePiece(KING_BLACK, 2, 2);
-			PlacePiece(RED, 1, 1);
+			PlacePiece(State.KING_BLACK, 2, 2);
+			PlacePiece(State.RED, 1, 1);
 		}
 
 		private string DebugPrintNodes(List<Node> points, string title = "")
@@ -285,26 +272,26 @@ namespace Data
 			Node n = sparseArray[pos.X, pos.Y];
 			State piece = n.GetState();
 			var neighbors = GetSpacesToCheck(pos);
-			if (piece == EMPTY)
+			if (piece == State.EMPTY)
 			{
 				return new List<Node>();
 				// maybe we should throw an exception?  or actually return a list of empty neighbors?
 			}
-			else if (piece == RED)
+			else if (piece == State.RED)
 			{
-				return neighbors.Where(x => x.GetState() == EMPTY &&
+				return neighbors.Where(x => x.GetState() == State.EMPTY &&
 											x.GetSparsePosition().Y < n.GetSparsePosition().Y
 											).ToList();
 			}
-			else if (piece == BLACK)
+			else if (piece == State.BLACK)
 			{
-				return neighbors.Where(x => x.GetState() == EMPTY &&
+				return neighbors.Where(x => x.GetState() == State.EMPTY &&
 											x.GetSparsePosition().Y > n.GetSparsePosition().Y
 											).ToList();
 			}
-			else if (piece == KING_RED || piece == KING_BLACK)
+			else if (piece == State.KING_RED || piece == State.KING_BLACK)
 			{
-				return neighbors.Where(x => x.GetState() == EMPTY).ToList();
+				return neighbors.Where(x => x.GetState() == State.EMPTY).ToList();
 			}
 			else
 			{
@@ -317,14 +304,14 @@ namespace Data
 			Node n = sparseArray[pos.X, pos.Y];
 			State piece = n.GetState();
 			var neighbors = GetSpacesToCheck(pos);
-			if (piece == EMPTY)
+			if (piece == State.EMPTY)
 			{
 				return new List<Node>();
 				// maybe we should throw an exception?  or actually return a list of empty neighbors?
 			}
 			else
 			{
-				return neighbors.Where(x => x.GetState() == EMPTY).ToList();
+				return neighbors.Where(x => x.GetState() == State.EMPTY).ToList();
 			}
 		}
 
@@ -334,7 +321,7 @@ namespace Data
 				return false;
 			if (pos.Y < 0 || pos.Y > 8)
 				return false;
-			return sparseArray[pos.X, pos.Y].GetState() == EMPTY;
+			return sparseArray[pos.X, pos.Y].GetState() == State.EMPTY;
 		}
 
 		public List<Node> GetAvailableJumps(Point pos)
@@ -344,14 +331,14 @@ namespace Data
 			var neighbors = GetSpacesToCheck(pos);
 
 			List<Node> validJumps = new List<Node>();
-			if (piece == EMPTY)
+			if (piece == State.EMPTY)
 			{
 				return validJumps;
 				// maybe we should throw an exception?  or actually return a list of empty neighbors?
 			}
-			else if (piece == RED)
+			else if (piece == State.RED)
 			{
-				var candidates = neighbors.Where(x => (x.GetState() == BLACK || x.GetState() == KING_BLACK) &&
+				var candidates = neighbors.Where(x => (x.GetState() == State.BLACK || x.GetState() == State.KING_BLACK) &&
 													   x.GetSparsePosition().Y < n.GetSparsePosition().Y &&
 													   GetAvailableEmptyPositionsForJumpingFor(x).Count > 0 &&
 													   !this.jumpedPieces.Contains(x)
@@ -367,9 +354,9 @@ namespace Data
 				}
 				return validJumps;
 			}
-			else if (piece == BLACK)
+			else if (piece == State.BLACK)
 			{
-				var candidates = neighbors.Where(x => (x.GetState() == RED || x.GetState() == KING_RED) &&
+				var candidates = neighbors.Where(x => (x.GetState() == State.RED || x.GetState() == State.KING_RED) &&
 													   x.GetSparsePosition().Y > n.GetSparsePosition().Y &&
 													   GetAvailableEmptyPositionsForJumpingFor(x).Count > 0 &&
 													   !this.jumpedPieces.Contains(x)
@@ -385,9 +372,9 @@ namespace Data
 				}
 				return validJumps;
 			}
-			else if (piece == KING_RED)
+			else if (piece == State.KING_RED)
 			{
-				var candidates = neighbors.Where(x => (x.GetState() == BLACK || x.GetState() == KING_BLACK) &&
+				var candidates = neighbors.Where(x => (x.GetState() == State.BLACK || x.GetState() == State.KING_BLACK) &&
 													   GetAvailableEmptyPositionsForJumpingFor(x).Count > 0 &&
 													   !this.jumpedPieces.Contains(x)).ToList();
 				foreach (var candidate in candidates)
@@ -401,9 +388,9 @@ namespace Data
 				}
 				return validJumps;
 			}
-			else if (piece == KING_BLACK)
+			else if (piece == State.KING_BLACK)
 			{
-				var candidates = neighbors.Where(x => (x.GetState() == RED || x.GetState() == KING_RED) &&
+				var candidates = neighbors.Where(x => (x.GetState() == State.RED || x.GetState() == State.KING_RED) &&
 													   GetAvailableEmptyPositionsForJumpingFor(x).Count > 0 &&
 													   !this.jumpedPieces.Contains(x)
 													   ).ToList();
@@ -441,14 +428,14 @@ namespace Data
 			{
 				for (int x = 0; x < 4; x++)
 				{
-					var s = EMPTY;
+					var s = State.EMPTY;
 					if (y <= 2)
 					{
-						s = BLACK;
+						s = State.BLACK;
 					}
 					else if (y >= 5)
 					{
-						s = RED;
+						s = State.RED;
 					}
 					PlacePiece(s, x, y);
 				}

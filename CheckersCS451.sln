@@ -5,11 +5,11 @@ VisualStudioVersion = 15.0.26430.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckersCS451", "CheckersCS451\CheckersCS451.csproj", "{D859DF9B-907F-4B31-A1FF-804DF67ACB8D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomControls", "CheckerboardControl\CustomControls.csproj", "{CE63CCC7-5DD2-43F5-B76F-EB0F7DF0F480}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckersServer", "CheckersServer\CheckersServer.csproj", "{36B0DF9D-6F46-480F-BA63-7DACB25F841E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data", "Data\Data.csproj", "{FD62E364-61C8-4155-BE3B-C7FE514B82B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckersUtilities", "CheckersUtilities\CheckersUtilities.csproj", "{F213C343-FD27-4458-A048-42E52A66B52C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +21,6 @@ Global
 		{D859DF9B-907F-4B31-A1FF-804DF67ACB8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D859DF9B-907F-4B31-A1FF-804DF67ACB8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D859DF9B-907F-4B31-A1FF-804DF67ACB8D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CE63CCC7-5DD2-43F5-B76F-EB0F7DF0F480}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CE63CCC7-5DD2-43F5-B76F-EB0F7DF0F480}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CE63CCC7-5DD2-43F5-B76F-EB0F7DF0F480}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CE63CCC7-5DD2-43F5-B76F-EB0F7DF0F480}.Release|Any CPU.Build.0 = Release|Any CPU
 		{36B0DF9D-6F46-480F-BA63-7DACB25F841E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{36B0DF9D-6F46-480F-BA63-7DACB25F841E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36B0DF9D-6F46-480F-BA63-7DACB25F841E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,6 +29,10 @@ Global
 		{FD62E364-61C8-4155-BE3B-C7FE514B82B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD62E364-61C8-4155-BE3B-C7FE514B82B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD62E364-61C8-4155-BE3B-C7FE514B82B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F213C343-FD27-4458-A048-42E52A66B52C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F213C343-FD27-4458-A048-42E52A66B52C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F213C343-FD27-4458-A048-42E52A66B52C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F213C343-FD27-4458-A048-42E52A66B52C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

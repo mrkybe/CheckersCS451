@@ -38,7 +38,6 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
@@ -86,13 +85,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CheckerboardControl\CustomControls.csproj">
-      <Project>{ce63ccc7-5dd2-43f5-b76f-eb0f7df0f480}</Project>
-      <Name>CustomControls</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Data\Data.csproj">
       <Project>{FD62E364-61C8-4155-BE3B-C7FE514B82B3}</Project>
       <Name>Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CheckersUtilities\CheckersUtilities.csproj">
+      <Project>{F213C343-FD27-4458-A048-42E52A66B52C}</Project>
+      <Name>CheckersUtilities</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -56,6 +56,10 @@
       <Project>{fd62e364-61c8-4155-be3b-c7fe514b82b3}</Project>
       <Name>Data</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CheckersUtilities\CheckersUtilities.csproj">
+      <Project>{F213C343-FD27-4458-A048-42E52A66B52C}</Project>
+      <Name>CheckersUtilities</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
