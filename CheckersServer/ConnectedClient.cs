@@ -141,11 +141,11 @@ namespace CheckersServer
 					break;
 				}
                 catch (SocketException se) {
-					if (se.Message.Trim().ToLower().Equals("an existing connection was forcibly closed by the remote host"))
-					{
+					//if (se.Message.Trim().ToLower().Equals("an existing connection was forcibly closed by the remote host"))
+					//{
 						Console.WriteLine(" Killing this thread - " + clientString);
 						break;
-                    }
+                    //}
                 }
 				catch (Exception ex)
 				{
