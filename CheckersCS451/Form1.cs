@@ -90,7 +90,9 @@ namespace CheckersCS451
                     return;
                 }
 
-				_myColor = GetPlayerColor();
+                clientSocket.Connect(ipAddress, 1337);
+
+                _myColor = GetPlayerColor();
 				_flip = _myColor == Player.PLAYER_BLACK;
 
 				keepBoardUpdatedThread = new Thread(KeepBoardUpdated);
@@ -128,6 +130,8 @@ namespace CheckersCS451
 
 			serverStream.Read(inStream, 0, 1);
 
+            Thread.Sleep(100);
+
 			if (inStream[0] == 1)
 			{
 				return Player.PLAYER_BLACK;
@@ -161,11 +165,14 @@ namespace CheckersCS451
 			byte[] messageLengthBytes = new byte[4];
 
 			serverStream.Read(messageLengthBytes, 0, messageLengthBytes.Length);
-			var messageLength = BitConverter.ToUInt32(messageLengthBytes, 0);
+
+            Thread.Sleep(100);
+            var messageLength = BitConverter.ToUInt32(messageLengthBytes, 0);
 
 			var inStream = new byte[messageLength];
 			serverStream.Read(inStream, 0, inStream.Length);
 
+            Thread.Sleep(100);
 			var gmBoardState = CheckersGM.FromBytes(inStream);
 
 			return gmBoardState;
