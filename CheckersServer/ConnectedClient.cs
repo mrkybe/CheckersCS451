@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Threading;
 using CheckersUtilities;
 using Data;
+using System.Runtime.Serialization;
 
 namespace CheckersServer
 {
@@ -141,13 +142,15 @@ namespace CheckersServer
 					break;
 				}
                 catch (SocketException se) {
-					//if (se.Message.Trim().ToLower().Equals("an existing connection was forcibly closed by the remote host"))
-					//{
-						Console.WriteLine(" Killing this thread - " + clientString);
-						break;
-                    //}
+					Console.WriteLine(" Killing this thread - " + clientString);
+					break;
                 }
-				catch (Exception ex)
+                catch (SerializationException se)
+                {
+                    Console.WriteLine(" Killing this thread - " + clientString);
+                    break;
+                }
+                catch (Exception ex)
 				{
 					Console.WriteLine(" >> " + ex.ToString());
 				}
