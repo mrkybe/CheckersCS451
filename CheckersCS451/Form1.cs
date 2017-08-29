@@ -94,9 +94,9 @@ namespace CheckersCS451
 
                 _myColor = GetPlayerColor();
 				_flip = _myColor == Player.PLAYER_BLACK;
-
-				keepBoardUpdatedThread = new Thread(KeepBoardUpdated);
-				keepBoardUpdatedThread.Start();
+                
+                keepBoardUpdatedThread = new Thread(KeepBoardUpdated);
+                keepBoardUpdatedThread.Start();
 			}
 			catch (Exception ex)
 			{
@@ -106,8 +106,9 @@ namespace CheckersCS451
 
 		private Thread keepBoardUpdatedThread;
 		private Point _from;
+        private bool gameOver;
 
-		private void KeepBoardUpdated()
+        private void KeepBoardUpdated()
 		{
 			while (clientSocket != null && clientSocket.Connected)
 			{
@@ -115,6 +116,12 @@ namespace CheckersCS451
 				{
 					_game = GetBoardState();
 					Update(_game);
+                    if (this.gameOver)
+                    {
+                        this._game = null;
+                        this.gameOver = false;
+                        break;
+                    }
 				}
 				catch (Exception ex)
 				{
@@ -465,7 +472,25 @@ namespace CheckersCS451
 			// this.Text = "Playing as: " + color + " | " + "Waiting on: " + player + " | " + "Turn #: " + turnNumber + " | " + "Game state: " + gameState;
 		}
 
-		public void Update(CheckersGM newState)
+        private void btn_forfeit_Click(object sender, EventArgs e)
+        {
+            if (this._game != null && this.clientSocket != null && this.clientSocket.Connected)
+            {
+                NetworkStream serverStream = new NetworkStream(clientSocket);
+
+                Turn turn = new Turn(Point.Empty, Point.Empty, true);
+
+                byte[] outStream = turn.ToBytes();
+                uint messageLength = (uint)outStream.Length;
+                byte[] messageLengthBytes = BitConverter.GetBytes(messageLength);
+
+                serverStream.Write(messageLengthBytes, 0, messageLengthBytes.Length);
+                serverStream.Write(outStream, 0, outStream.Length);
+                serverStream.Flush();
+            }
+        }
+
+        public void Update(CheckersGM newState)
 		{
 			this._game = newState;
 			UpdateText();
@@ -550,8 +575,47 @@ namespace CheckersCS451
 					sparseCol++;
 				}
 			}
-		}
 
+            GameState state = _game.GetCurrentGameState();
+
+            if (state == GameState.BLACK_WIN || state == GameState.RED_WIN)
+            {
+                String message = "Game over! You {0}!";
+                if ((state == GameState.BLACK_WIN && _myColor == Player.PLAYER_BLACK) || (state == GameState.RED_WIN && _myColor == Player.PLAYER_RED))
+                {
+                    message = String.Format(message, "won");
+                } else
+                {
+                    message = String.Format(message, "lost");
+                }
+
+                MessageBox.Show(message, caption: "Game Over");
+
+                this.clientSocket.Disconnect(false);
+                this.clientSocket = null;
+                clearBoard();
+                this.gameOver = true;
+            }
+        }
+
+        private void clearBoard()
+        {
+            for (int row = 0; row < this.board.RowCount; row++)
+            {
+                for (int col = 0; col < this.board.ColumnCount; col++)
+                {
+                    Control cell = this.board.GetControlFromPosition(col, row);
+
+                    if (cell == null)
+                    {
+                        continue;
+                    }
+
+                    cell.BackColor = Color.Transparent;
+                    cell.BackgroundImage = null;
+                }
+            }
+        }
 
 
 		public string DebugPrintSparseArrayLOCAL(Node[,] sparseArray)

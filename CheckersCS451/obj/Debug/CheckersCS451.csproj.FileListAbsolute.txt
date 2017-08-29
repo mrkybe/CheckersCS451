@@ -11,3 +11,16 @@ C:\Users\Camden\Desktop\CheckersCS451-master\CheckersCS451\obj\Debug\CheckersCS4
 C:\Users\Camden\Desktop\CheckersCS451-master\CheckersCS451\obj\Debug\CheckersCS451.csproj.GenerateResource.Cache
 C:\Users\Camden\Desktop\CheckersCS451-master\CheckersCS451\obj\Debug\CheckersCS451.exe
 C:\Users\Camden\Desktop\CheckersCS451-master\CheckersCS451\obj\Debug\CheckersCS451.pdb
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersCS451\bin\Debug\CheckersCS451.exe.config
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersCS451\bin\Debug\CheckersCS451.exe
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersCS451\bin\Debug\CheckersCS451.pdb
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersCS451\bin\Debug\CheckersUtilities.dll
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersCS451\bin\Debug\Data.dll
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersCS451\bin\Debug\Data.pdb
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersCS451\bin\Debug\CheckersUtilities.pdb
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersCS451\obj\Debug\CheckersCS451.csprojResolveAssemblyReference.cache
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersCS451\obj\Debug\CheckersCS451.Form1.resources
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersCS451\obj\Debug\CheckersCS451.Properties.Resources.resources
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersCS451\obj\Debug\CheckersCS451.csproj.GenerateResource.Cache
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersCS451\obj\Debug\CheckersCS451.exe
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersCS451\obj\Debug\CheckersCS451.pdb

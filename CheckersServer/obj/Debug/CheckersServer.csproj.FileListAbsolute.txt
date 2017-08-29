@@ -8,3 +8,13 @@ C:\Users\Camden\Desktop\CheckersCS451-master\CheckersServer\bin\Debug\CheckersUt
 C:\Users\Camden\Desktop\CheckersCS451-master\CheckersServer\obj\Debug\CheckersServer.csprojResolveAssemblyReference.cache
 C:\Users\Camden\Desktop\CheckersCS451-master\CheckersServer\obj\Debug\CheckersServer.exe
 C:\Users\Camden\Desktop\CheckersCS451-master\CheckersServer\obj\Debug\CheckersServer.pdb
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersServer\bin\Debug\CheckersServer.exe.config
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersServer\bin\Debug\CheckersServer.exe
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersServer\bin\Debug\CheckersServer.pdb
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersServer\bin\Debug\CheckersUtilities.dll
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersServer\bin\Debug\Data.dll
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersServer\bin\Debug\Data.pdb
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersServer\bin\Debug\CheckersUtilities.pdb
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersServer\obj\Debug\CheckersServer.csprojResolveAssemblyReference.cache
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersServer\obj\Debug\CheckersServer.exe
+C:\Users\cjm377\Downloads\CheckersCS451-master\CheckersServer\obj\Debug\CheckersServer.pdb
