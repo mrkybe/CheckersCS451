@@ -63,11 +63,32 @@ namespace CheckersCS451
 
 			try
 			{
-				clientSocket = new Socket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
+				clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-				IPHostEntry ipHostInfo = Dns.GetHostEntry(box_serverIP.Text);
-				IPAddress ipAddress = ipHostInfo.AddressList[0];
-				clientSocket.Connect(ipAddress, 1337);
+                IPAddress ipAddress = null;
+
+                if (box_serverIP.Text.Trim().Equals(String.Empty))
+                {
+                    ipAddress = Array.FindLast(Dns.GetHostEntry(String.Empty).AddressList, a => a.AddressFamily == AddressFamily.InterNetwork);
+                }
+                else
+                {
+                    try
+                    {
+                        ipAddress = IPAddress.Parse(box_serverIP.Text);
+                    }
+                    catch (Exception)
+                    {
+                        MessageBox.Show("Invalid IP Address entered!");
+                        return;
+                    }
+                }
+                
+                if (ipAddress == null)
+                {
+                    MessageBox.Show("Invalid IP Address!");
+                    return;
+                }
 
 				_myColor = GetPlayerColor();
 				_flip = _myColor == Player.PLAYER_BLACK;

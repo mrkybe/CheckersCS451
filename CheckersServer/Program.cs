@@ -19,11 +19,11 @@ namespace CheckersServer
 			games = new List<CheckersGM>();
 
 			IPAddress[] addr = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
-			Console.WriteLine("Server ipv4: " + addr[addr.Length - 1]);
+			Console.WriteLine("Server bridge ipv6: " + addr[addr.Length - 1]);
 
 			if (addr[0].AddressFamily == AddressFamily.InterNetworkV6)
 			{
-				Console.WriteLine("Server ipv6: " + addr[0]);
+				Console.WriteLine("Server network ipv6: " + addr[0]);
 			}
 
 			SetupSockets();
